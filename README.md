@@ -2,7 +2,7 @@
 
 ## hardlinksearch
 
-`python3 hardlinksearch.py /path/to/dir/to/check` to just save to csv
+`python3 hardlinksearch.py /path/to/dir/to/check` to just save to csv   
 `python3 hardlinksearch.py /path/to/dir/to/check --delete --dry-run` with or without `--dry-run`
 
 hardlinksearch searches for non-hardlinked mkv files in a specified dir and saves them to a csv   
