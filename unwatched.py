@@ -2,10 +2,8 @@ import requests
 import json
 import csv
 
-# Get the unwatched titles from Tautulli and export them to a CSV file.
-
-def get_unwatched_titles(api_key, base_url):
-    url = f"{base_url}/api/v2?apikey={api_key}&cmd=get_library_media_info&section_id=1&unwatched=1"
+def get_unwatched_titles(api_key, base_url, section_id):
+    url = f"{base_url}/api/v2?apikey={api_key}&cmd=get_library_media_info&section_id={section_id}&unwatched=1"
     response = requests.get(url)
 
     if response.status_code == 200:
@@ -15,7 +13,7 @@ def get_unwatched_titles(api_key, base_url):
         print(f"Error: {response.status_code}")
         return []
 
-def export_unwatched_titles_to_csv(unwatched_titles, file_name="unwatched_titles.csv"):
+def export_unwatched_titles_to_csv(unwatched_titles, file_name):
     with open(file_name, "w", newline="", encoding="utf-8") as file:
         writer = csv.writer(file)
         writer.writerow(["Title", "Year", "Rating", "Content Rating"])
@@ -29,13 +27,24 @@ def export_unwatched_titles_to_csv(unwatched_titles, file_name="unwatched_titles
             ])
 
 if __name__ == "__main__":
-    api_key = "api_key"
-    base_url = "http://127.0.0.1:8181/tautulli"
+    api_key = "<your_tautulli_api_key>"
+    base_url = "<your_tautulli_base_url>"
     
-    unwatched_titles = get_unwatched_titles(api_key, base_url)
+    # Replace these with the correct section IDs for your movies and shows libraries
+    movies_section_id = 1
+    shows_section_id = 2
 
-    if unwatched_titles:
-        export_unwatched_titles_to_csv(unwatched_titles)
-        print(f"{len(unwatched_titles)} unwatched titles have been exported to 'unwatched_titles.csv'.")
+    unwatched_movies = get_unwatched_titles(api_key, base_url, movies_section_id)
+    unwatched_shows = get_unwatched_titles(api_key, base_url, shows_section_id)
+
+    if unwatched_movies:
+        export_unwatched_titles_to_csv(unwatched_movies, "unwatched_movies.csv")
+        print(f"{len(unwatched_movies)} unwatched movies have been exported to 'unwatched_movies.csv'.")
     else:
-        print("No unwatched titles found.")
+        print("No unwatched movies found.")
+
+    if unwatched_shows:
+        export_unwatched_titles_to_csv(unwatched_shows, "unwatched_shows.csv")
+        print(f"{len(unwatched_shows)} unwatched shows have been exported to 'unwatched_shows.csv'.")
+    else:
+        print("No unwatched shows found.")
