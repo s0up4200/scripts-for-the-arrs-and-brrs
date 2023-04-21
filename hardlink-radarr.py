@@ -45,9 +45,6 @@ def get_movie_by_folder_path(folder_path):
         params={"apikey": RADARR_API_KEY},
     )
 
-    #print(f"Radarr API response status code: {response.status_code}")
-    #print(f"Radarr API response text: {response.text}")
-
     response.raise_for_status()
     movies = response.json()
 
@@ -59,13 +56,6 @@ def get_movie_by_folder_path(folder_path):
             return movie
 
     return None
-
-#def delete_movie_file(movie_file_path):
-#    try:
-#        os.remove(movie_file_path)
-#        print(f"Deleted non-hardlinked movie file: {movie_file_path}")
-#    except OSError as e:
-#        print(f"Error deleting movie file: {movie_file_path}\nError message: {e}")
 
 def refresh_movie(movie_id):
     command_url = f"{RADARR_URL}/api/v3/command"
@@ -145,4 +135,3 @@ if __name__ == "__main__":
         amount = int(sys.argv[3])
         non_hardlinked_files = read_from_csv(csv_file_path)
         process_movies(non_hardlinked_files, amount)
-
