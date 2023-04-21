@@ -2,7 +2,7 @@ import requests
 from datetime import datetime
 
 """
-This script filters and monitors movies in Radarr based on a specified custom format and their availability.
+This script checks and monitors movies in Radarr based on a specified custom format and their availability.
 It checks if a movie does not have the specified custom format assigned and if it has been physically or digitally released.
 For filtered movies that are not monitored, the script updates their monitored status in Radarr.
 At the end, a summary of the number of filtered movies and the unmonitored movies that have been monitored is printed.
@@ -92,7 +92,7 @@ for movie in filtered_movies:
 
 
 # Print the summary statement
-print(f"{filtered_count} movies do not have the custom format \"{custom_format_name}\" assigned. All of them are being monitored.")
+print(f"{filtered_count} movies do not have the custom format \"{custom_format_name}\" assigned.")
 
 if unmonitored_count == 1:
     print(f"There was {unmonitored_count} unmonitored movie out of the {filtered_count}, it is now being monitored.")
