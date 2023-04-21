@@ -1,6 +1,8 @@
 #!/usr/bin/env python
 # -*- coding: utf-8 -*-
 
+# based on this: https://github.com/blacktwin/JBOPS
+
 """
 Find what was added TFRAME ago and not watched using Tautulli.
 """
