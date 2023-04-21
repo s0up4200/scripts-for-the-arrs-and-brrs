@@ -63,7 +63,7 @@ def get_movie_by_folder_path(folder_path):
 def delete_movie_file(movie_file_path):
     try:
         os.remove(movie_file_path)
-        print(f"Deleted movie file: {movie_file_path}")
+        print(f"Deleted non-hardlinked movie file: {movie_file_path}")
     except OSError as e:
         print(f"Error deleting movie file: {movie_file_path}\nError message: {e}")
 
@@ -110,7 +110,7 @@ def process_movies(non_hardlinked_files, amount):
         movie = get_movie_by_folder_path(folder_path)
 
         if movie:
-            print(f"Monitoring and searching for movie: {movie['title']} (ID: {movie['id']})")
+            print(f"Searching for movie: {movie['title']} (ID: {movie['id']})")
             monitor_and_search_movie(movie['id'], movie_file_path)
             non_hardlinked_files.remove(movie_file_path)
             with open("non_hardlinked_files.csv", "w") as f:
