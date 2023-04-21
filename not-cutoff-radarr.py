@@ -1,5 +1,7 @@
 import requests
 from datetime import datetime
+import random
+import argparse
 
 """
 This script checks and monitors movies in Radarr based on a specified custom format and their availability.
@@ -104,10 +106,49 @@ if unmonitored_count == 1:
 elif unmonitored_count > 1:
     print(f"There were {unmonitored_count} unmonitored movies out of the {filtered_count}, they are now being monitored.")
 
-answer = input("Do you want to save the list of movies to not-cutoff.txt? (Y/n): ")
 
-if answer.lower() == 'y' or answer == '':
+# Parse command-line arguments
+parser = argparse.ArgumentParser(description='Check and monitor movies in Radarr.')
+parser.add_argument('--unattended', type=int, metavar='N',
+                    help='Run the script unattended and search for N movies at the end without user interaction.')
+
+args = parser.parse_args()
+
+if args.unattended is None:
+    save_answer = input("Do you want to save the list of movies to not-cutoff.txt? (Y/n): ")
+    search_answer = input("Do you want to search for upgrades of these movies? (Y/n): ")
+    num_search = input("How many movies do you want to search? (Enter 0 to skip): ")
+else:
+    save_answer = 'y'
+    search_answer = 'y'
+    num_search = args.unattended
+
+# Prompt the user to save the list of movies and search for upgraded versions
+if save_answer.lower() != 'y' and save_answer != '':
+    print("Skipping saving the list of movies.")
+else:
     with open('not-cutoff.txt', 'w') as f:
         for movie in filtered_movies:
             f.write(movie['title'] + '\n')
-        print("List of movies has been saved to not-cutoff.txt")
+    print("List of movies has been saved to not-cutoff.txt")
+
+    if search_answer.lower() == 'y' or search_answer == '':
+        try:
+            num_search = int(num_search)
+        except ValueError:
+            num_search = 0
+        if num_search > 0:
+            with open('not-cutoff.txt') as f:
+                titles = f.readlines()
+            random_titles = random.sample(titles, num_search)
+            for title in random_titles:
+                title = title.strip()
+                movie = next((m for m in filtered_movies if m['title'] == title), None)
+                if movie is not None:
+                    search_url = f'{radarr_url}/api/v3/command'
+                    search_payload = {'name': 'MoviesSearch', 'movieIds': [movie['id']]}
+                    response = requests.post(search_url, json=search_payload, params={'apiKey': api_key})
+                    if response.status_code == 201:
+                        print(f"Search for upgraded version of \"{movie['title']}\" has been triggered.")
+                    else:
+                        print(f"Error searching for upgraded version of \"{movie['title']}\": {response.status_code}")

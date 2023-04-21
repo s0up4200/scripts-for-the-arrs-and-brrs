@@ -23,9 +23,16 @@ python3 hardlink-radarr.py /path/to/movies --replace <amount>
 
 ## not-cutoff-radarr.py
 
+Attended
 ```bash
 python3 not-cutoff-radarr.py
 ```
+
+Unattended. Provide the amount of movies it should trigger a search for.
+```bash
+python3 not-cutoff-radarr.py --unattended <amount>
+```
+
 
 This script checks and monitors movies in Radarr based on a specified custom format and their availability.
 It checks if a movie does not have the specified custom format assigned and if it has been physically or digitally released.
