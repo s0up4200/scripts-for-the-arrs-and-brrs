@@ -1,16 +1,21 @@
 # scripts
 
-## hardlinksearch
+## hardlink-radarr.py
 
-`python3 hardlinksearch.py /path/to/dir/to/check` to just save to csv   
-`python3 hardlinksearch.py /path/to/dir/to/check --delete --dry-run` with or without `--dry-run`
+The point of this script is to make sure everything in Radarr is seeded in your torrent client. Whenever a torrent is deleted from the tracker, programs like qbit_manage can automatically delete it from your qBittorrent instance for you.
+This naturally breaks the hardlink and leaves you with a movie that is not seeded anymore.
 
-hardlinksearch searches for non-hardlinked mkv files in a specified dir and saves them to a csv   
-optionally call with `--delete [--dry-run]` to delete the non-hardlinked files **!!!AND ANY OTHER FILE WITHING THE SAME DIR!!!**
+This script checks for non-hardlinked movies in your Radarr library. When it finds a non-hardlinked movie, it deletes the file and instructs Radarr to trigger a search for the movie again.
 
-## search_missing_radarr
-search_missing_radarr triggers a search for a monitored movie that is missing (and considered to have a digital or physical release)   
-call with a number to decide how many movies to search for `python3 search_missing_radarr.py 3`
+### Usage
+
+```bash
+python3 hardlink-radarr.py /path/to/movies # this saves the non-hardlinked movies to a csv file - nothing is deleted
+```
+
+```bash
+python3 hardlink-radarr.py /path/to/movies --replace <amount> # this deletes the given amount of non-hardlinked movies and instructs Radarr to search for them again
+```
 
 ## unwatched
 wip
