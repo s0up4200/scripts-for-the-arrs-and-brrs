@@ -60,26 +60,26 @@ def get_movie_by_folder_path(folder_path):
 
     return None
 
-def delete_movie_file(movie_file_path):
-    try:
-        os.remove(movie_file_path)
-        print(f"Deleted non-hardlinked movie file: {movie_file_path}")
-    except OSError as e:
-        print(f"Error deleting movie file: {movie_file_path}\nError message: {e}")
+#def delete_movie_file(movie_file_path):
+#    try:
+#        os.remove(movie_file_path)
+#        print(f"Deleted non-hardlinked movie file: {movie_file_path}")
+#    except OSError as e:
+#        print(f"Error deleting movie file: {movie_file_path}\nError message: {e}")
 
 def refresh_movie(movie_id):
     command_url = f"{RADARR_URL}/api/v3/command"
     command_payload = {"name": "RescanMovie", "movieId": movie_id}
     response = requests.post(command_url, json=command_payload, params={"apikey": RADARR_API_KEY})
     response.raise_for_status()
-    print(f"Refreshing movie (ID: {movie_id})")
+    print(f"\nRefreshing movie (ID: {movie_id})")
     time.sleep(5)  # Wait for the refresh to complete
 
 def monitor_and_search_movie(movie_id, movie_file_path):
     # Delete the movie file
     try:
         os.remove(movie_file_path)
-        print(f"Deleted non-hardlinked movie file: {movie_file_path}")
+        print(f"Deleted non-hardlinked movie: {movie_file_path}")
     except Exception as e:
         print(f"Error deleting movie file: {e}")
         return
@@ -97,20 +97,26 @@ def monitor_and_search_movie(movie_id, movie_file_path):
 
     search_url = f"{RADARR_URL}/api/v3/command"
     search_payload = {"name": "MoviesSearch", "movieIds": [movie_id]}
-    
-    response = requests.post(search_url, json=search_payload, params={"apikey": RADARR_API_KEY})
-    #print(f"Search movie response status code: {response.status_code}")
-    #print(f"Search movie response text: {response.text}")
 
+    response = requests.post(search_url, json=search_payload, params={"apikey": RADARR_API_KEY})
     response.raise_for_status()
 
+    print(f"\nMonitoring and searching for movie: {movie['title']} (ID: {movie['id']})")
+
 def process_movies(non_hardlinked_files, amount):
+    print(f"\nLooking for non-hardlinked movies in {dir_path}...\n")
+    print(f"Found {len(non_hardlinked_files)} non-hardlinked movies.", end='')
+
+    if len(non_hardlinked_files) > 0 and amount > 0:
+        print(f" Replacing {amount} of them.\n")
+    else:
+        print("\n")
+
     for movie_file_path in non_hardlinked_files[:amount]:
         folder_path = os.path.dirname(movie_file_path)
         movie = get_movie_by_folder_path(folder_path)
 
         if movie:
-            print(f"Monitoring and searching for movie: {movie['title']} (ID: {movie['id']})")
             monitor_and_search_movie(movie['id'], movie_file_path)
             non_hardlinked_files.remove(movie_file_path)
             with open("non_hardlinked_files.csv", "w") as f:
