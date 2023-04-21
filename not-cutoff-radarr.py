@@ -12,6 +12,8 @@ radarr_url = "http://localhost:7878/radarr" # Change this to your Radarr URL
 api_key = "api_key" # Change this to your Radarr API key
 custom_format_name = "HD Bluray Tier 01" # Change this to the name of the custom format you want to filter by
 
+print(f"Checking for movies in Radarr that do not have the custom format \"{custom_format_name}\" assigned and are available...")
+
 def is_movie_available(movie):
     current_date = datetime.now().date()
     if movie['status'] == 'released':
@@ -92,7 +94,10 @@ for movie in filtered_movies:
 
 
 # Print the summary statement
-print(f"{filtered_count} movies do not have the custom format \"{custom_format_name}\" assigned.")
+if unmonitored_count == 0:
+    print(f"All {filtered_count} movies have the custom format \"{custom_format_name}\" assigned. They are already monitored.")
+else:
+    print(f"{filtered_count} movies do not have the custom format \"{custom_format_name}\" assigned.")
 
 if unmonitored_count == 1:
     print(f"There was {unmonitored_count} unmonitored movie out of the {filtered_count}, it is now being monitored.")
@@ -105,4 +110,4 @@ if answer.lower() == 'y' or answer == '':
     with open('not-cutoff.txt', 'w') as f:
         for movie in filtered_movies:
             f.write(movie['title'] + '\n')
-
+        print("List of movies has been saved to not-cutoff.txt")
