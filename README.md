@@ -21,5 +21,18 @@ Run and replace the amount given in the command.
 python3 hardlink-radarr.py /path/to/movies --replace <amount>
 ```
 
+## not-cutoff-radarr.py
+
+```bash
+python3 not-cutoff-radarr.py
+```
+
+This script checks and monitors movies in Radarr based on a specified custom format and their availability.
+It checks if a movie does not have the specified custom format assigned and if it has been physically or digitally released.
+For filtered movies that are not monitored, the script updates their monitored status in Radarr.
+At the end, a summary of the number of filtered movies and the unmonitored movies that have been monitored is printed.
+
+It does not delete anything, it does not trigger any searches.
+
 ## unwatched
 wip
