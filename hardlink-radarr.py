@@ -4,7 +4,7 @@ import sys
 import requests
 import time
 
-RADARR_URL = "http://localhost:7878/radarr"  # Replace with your Radarr API URL
+RADARR_URL = "http://localhost:7878/radarr"  # Replace with your Radarr URL
 RADARR_API_KEY = "api_key"  # Replace with your Radarr API key
 
 def get_non_hardlinked_files(dir_path):
