@@ -95,7 +95,7 @@ for movie in filtered_movies:
 
 # Print the summary statement
 if unmonitored_count == 0:
-    print(f"All {filtered_count} movies do not have the custom format \"{custom_format_name}\" assigned. They are already monitored.")
+    print(f"{filtered_count} movies do not have the custom format \"{custom_format_name}\" assigned. They are already monitored.")
 else:
     print(f"{filtered_count} movies do not have the custom format \"{custom_format_name}\" assigned.")
 
