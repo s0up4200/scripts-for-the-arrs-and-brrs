@@ -1,6 +1,7 @@
 import qbittorrentapi
 import sys
 import csv
+import argparse
 
 # Requirements: pip3 install qbittorrent-api
 
@@ -8,13 +9,20 @@ import csv
 # Optionally saves the results to a CSV file
 
 # Replace the credentials below with your qBittorrent credentials
-qbt_client = qbittorrentapi.Client(host='http://127.0.0.1:webui_port', username='user', password='pass')
+qbt_client = qbittorrentapi.Client(host='http://localhost:web_ui_port', username='user', password='pass')
 
 try:
     qbt_client.auth_log_in()
 except qbittorrentapi.LoginFailed as e:
     print(e)
     sys.exit()
+
+# Set up command-line arguments
+parser = argparse.ArgumentParser(description='Calculate the average ratio of torrents in categories and tags')
+parser.add_argument('--tags-only', action='store_true', help='Only export tags')
+parser.add_argument('--categories-only', action='store_true', help='Only export categories')
+
+args = parser.parse_args()
 
 # Fetch all torrents
 torrents = qbt_client.torrents_info()
@@ -45,17 +53,19 @@ for torrent in torrents:
 sorted_categories = sorted(category_ratios.items(), key=lambda x: x[1]['total_ratio'] / x[1]['count'], reverse=True)
 sorted_tags = sorted(tag_ratios.items(), key=lambda x: x[1]['total_ratio'] / x[1]['count'], reverse=True)
 
-# Display the results for categories
-print("Average Ratios for Categories:")
-for category, data in sorted_categories:
-    average_ratio = data['total_ratio'] / data['count']
-    print(f"Category: {category}, Average Ratio: {average_ratio:.2f}")
+if not args.tags_only:
+    # Display the results for categories
+    print("Average Ratios for Categories:")
+    for category, data in sorted_categories:
+        average_ratio = data['total_ratio'] / data['count']
+        print(f"Category: {category}, Average Ratio: {average_ratio:.2f}")
 
-# Display the results for tags
-print("\nAverage Ratios for Tags:")
-for tag, data in sorted_tags:
-    average_ratio = data['total_ratio'] / data['count']
-    print(f"Tag: {tag}, Average Ratio: {average_ratio:.2f}")
+if not args.categories_only:
+    # Display the results for tags
+    print("\nAverage Ratios for Tags:")
+    for tag, data in sorted_tags:
+        average_ratio = data['total_ratio'] / data['count']
+        print(f"Tag: {tag}, Average Ratio: {average_ratio:.2f}")
 
 # Prompt user to save results to a CSV file
 save_to_csv = input("\nDo you want to save the results to a CSV file? (yes/no): ").lower()
