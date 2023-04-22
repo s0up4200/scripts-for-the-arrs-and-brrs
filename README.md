@@ -33,13 +33,48 @@ Unattended. Provide the amount of movies it should trigger a search for.
 python3 not-cutoff-radarr.py --unattended <amount>
 ```
 
-
 This script checks and monitors movies in Radarr based on a specified custom format and their availability.
 It checks if a movie does not have the specified custom format assigned and if it has been physically or digitally released.
 For filtered movies that are not monitored, the script updates their monitored status in Radarr.
 At the end, a summary of the number of filtered movies and the unmonitored movies that have been monitored is printed.
 
 It does not delete anything, it does not trigger any searches.
+
+## qBittorrent Ratio Analyzer
+
+This script calculates the average ratio of torrents in each category and tag in qBittorrent. The results can be displayed in the console and optionally saved to a CSV file.
+
+### Requirements
+
+To run the script, you will need Python 3 and the qbittorrent-api library installed. You can install the library using the following command:
+
+```bash
+pip3 install qbittorrent-api
+```
+
+### Usage
+
+Open the script file in a text editor and set your qBittorrent Web UI credentials (host, username, and password:
+
+```python
+QBITTORRENT_HOST = 'http://localhost:8080'
+QBITTORRENT_USERNAME = 'my_username'
+QBITTORRENT_PASSWORD = 'my_password'
+```
+
+Alternatively, you can pass these credentials as command-line arguments when running the script.
+
+### Available command-line arguments
+
+```
+--host               qBittorrent Web UI host (default: value set in script)
+--username           qBittorrent Web UI username (default: value set in script)
+--password           qBittorrent Web UI password (default: value set in script)
+--tags-only          Only export tags
+--categories-only    Only export categories
+--exclude-tags       "Tag1" "Tag2" "Tag3"
+--exclude-categories "Category1" "Category2" "Category3"
+```
 
 ## unwatched
 wip
