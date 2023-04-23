@@ -38,8 +38,6 @@ It checks if a movie does not have the specified custom format assigned and if i
 For filtered movies that are not monitored, the script updates their monitored status in Radarr.
 At the end, a summary of the number of filtered movies and the unmonitored movies that have been monitored is printed.
 
-It does not delete anything, it does not trigger any searches.
-
 ## qBittorrent Ratio Analyzer
 
 This script calculates the average ratio of torrents in each category and tag in qBittorrent. The results can be displayed in the console and optionally saved to a CSV file.
