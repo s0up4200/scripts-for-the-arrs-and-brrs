@@ -81,22 +81,6 @@ def filter_movies(movies, custom_format_id):
                 print(f'Error fetching movie file for {movie["title"]}: {movie_file_response.status_code}')
         else:
             filtered_movies.append(movie)
-   
-def filter_movies(movies, custom_format_id):
-    filtered_movies = []
-    for movie in movies:
-        if not is_movie_available(movie):
-            continue
-        if 'movieFile' in movie:
-            movie_file_response = requests.get(f'{RADARR_URL}/api/v3/moviefile/{movie["movieFile"]["id"]}', params={'apiKey': API_KEY})
-            if movie_file_response.status_code == 200:
-                movie_file = movie_file_response.json()
-                if custom_format_id not in [format['id'] for format in movie_file.get('customFormats', [])]:
-                    filtered_movies.append(movie)
-            else:
-                print(f'Error fetching movie file for {movie["title"]}: {movie_file_response.status_code}')
-        else:
-            filtered_movies.append(movie)
     return filtered_movies
 
 def monitor_filtered_movies(filtered_movies):
