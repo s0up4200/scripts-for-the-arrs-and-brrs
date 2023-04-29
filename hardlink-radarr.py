@@ -132,7 +132,7 @@ def show_help():
 Options:
 
   --replace <amount>   Replace specified amount of non-hardlinked movies
-  --force              Automatically delete non-hardlinked movies without confirmation
+  --force              Automatically delete non-hardlinked movies without confirmation (Must be called with --replace <amount>)
   --help               Display this help text
   
   If no flags are specified, the script will only save non-hardlinked movies to non_hardlinked_files.csv

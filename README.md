@@ -9,16 +9,22 @@ This script checks for non-hardlinked movies in your Radarr library. When it fin
 
 ### Usage
 
-Add your Radarr URL and api_key to the script on line 7 and 8.
+Add your `RADARR_URL`, `RADARR_API_KEY` and `DIR_PATH` to the script on line 7, 8 and 9.
 
-Run without deletion. Saves them to a csv file.
 ```bash
-python3 hardlink-radarr.py /path/to/movies
+python3 hardlink-radarr.py --help
 ```
+    
+```text
+Usage: python3 hardlink-radarr.py [options]
 
-Run and replace the amount given in the command.
-```bash
-python3 hardlink-radarr.py /path/to/movies --replace <amount>
+Options:
+
+  --replace <amount>   Replace specified amount of non-hardlinked movies
+  --force              Automatically delete non-hardlinked movies without confirmation (Must be called with --replace <amount>)
+  --help               Display this help text
+
+  If no flags are specified, the script will only save non-hardlinked movies to non_hardlinked_files.csv
 ```
 
 ## not-cutoff-radarr.py
