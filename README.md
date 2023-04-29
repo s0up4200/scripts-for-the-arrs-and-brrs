@@ -29,6 +29,8 @@ Options:
 
 ## not-cutoff-radarr.py
 
+Add your `RADARR_URL`, `RADARR_API_KEY` and `CUSTOM_FORMAT_NAME` to the script on line 13, 14 and 15.
+
 Attended
 ```bash
 python3 not-cutoff-radarr.py

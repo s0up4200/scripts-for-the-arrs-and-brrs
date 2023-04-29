@@ -1,6 +1,7 @@
 import requests
 from datetime import datetime
 import random
+import sys
 import argparse
 
 """
@@ -11,7 +12,7 @@ At the end, a summary of the number of filtered movies and the unmonitored movie
 """
 
 RADARR_URL = "http://localhost:7878/radarr"  # Change this to your Radarr URL
-API_KEY = "api_key"  # Change this to your Radarr API key
+RADARR_API_KEY = "api_key"  # Change this to your Radarr API key
 CUSTOM_FORMAT_NAME = "HD Bluray Tier 01"  # Change this to the name of the custom format you want to filter by
 
 print(f"Checking for movies in Radarr that do not have the custom format \"{CUSTOM_FORMAT_NAME}\" assigned and are available...")
@@ -31,7 +32,7 @@ def is_movie_available(movie):
     return False
 
 def monitor_movie(movie):
-    update_url = f'{RADARR_URL}/api/v3/movie/{movie["id"]}?apiKey={API_KEY}'
+    update_url = f'{RADARR_URL}/api/v3/movie/{movie["id"]}?apiKey={RADARR_API_KEY}'
     headers = {'Content-Type': 'application/json'}
     payload = movie
     payload['monitored'] = True
@@ -43,7 +44,7 @@ def monitor_movie(movie):
     return True
 
 def fetch_custom_formats():
-    response = requests.get(f'{RADARR_URL}/api/v3/customformat', params={'apiKey': API_KEY})
+    response = requests.get(f'{RADARR_URL}/api/v3/customformat', params={'apiKey': RADARR_API_KEY})
     if response.status_code == 200:
         return response.json()
     else:
@@ -59,7 +60,7 @@ def find_custom_format_id(custom_formats, custom_format_name):
 
 
 def fetch_movies():
-    response = requests.get(f'{RADARR_URL}/api/v3/movie', params={'apiKey': API_KEY})
+    response = requests.get(f'{RADARR_URL}/api/v3/movie', params={'apiKey': RADARR_API_KEY})
     if response.status_code == 200:
         return response.json()
     else:
@@ -72,7 +73,7 @@ def filter_movies(movies, custom_format_id):
         if not is_movie_available(movie):
             continue
         if 'movieFile' in movie:
-            movie_file_response = requests.get(f'{RADARR_URL}/api/v3/moviefile/{movie["movieFile"]["id"]}', params={'apiKey': API_KEY})
+            movie_file_response = requests.get(f'{RADARR_URL}/api/v3/moviefile/{movie["movieFile"]["id"]}', params={'apiKey': RADARR_API_KEY})
             if movie_file_response.status_code == 200:
                 movie_file = movie_file_response.json()
                 if custom_format_id not in [format['id'] for format in movie_file.get('customFormats', [])]:
@@ -130,12 +131,13 @@ def main():
         args = parse_args()
 
         if args.unattended is None:
-            save_answer = input("Do you want to save the list of movies to not-cutoff.txt? (Y/n): ")
-            search_answer = input("Do you want to search for upgrades of these movies? (Y/n): ")
+            save_answer = input("Save the list of movies to not-cutoff.txt and continue to search? (Y/n): ")
+            if save_answer.lower() != 'y' and save_answer != '':
+                print("Exiting program.")
+                sys.exit(0)
             num_search = input("How many movies do you want to search? (Enter 0 to skip): ")
         else:
             save_answer = 'y'
-            search_answer = 'y'
             num_search = args.unattended
 
         # Prompt the user to save the list of movies and search for upgraded versions
@@ -147,27 +149,25 @@ def main():
                     f.write(movie['title'] + '\n')
             print("List of movies has been saved to not-cutoff.txt")
 
-            if search_answer.lower() == 'y' or search_answer == '':
-                try:
-                    num_search = int(num_search)
-                except ValueError:
-                    num_search = 0
-                if num_search > 0:
-                    with open('not-cutoff.txt') as f:
-                        titles = f.readlines()
-                    random_titles = random.sample(titles, num_search)
-                    for title in random_titles:
-                        title = title.strip()
-                        movie = next((m for m in filtered_movies if m['title'] == title), None)
-                        if movie is not None:
-                            search_url = f'{RADARR_URL}/api/v3/command'
-                            search_payload = {'name': 'MoviesSearch', 'movieIds': [movie['id']]}
-                            response = requests.post(search_url, json=search_payload, params={'apiKey': API_KEY})
-                            if response.status_code == 201:
-                                print(f"Search for upgraded version of \"{movie['title']}\" has been triggered.")
-                            else:
-                                print(f"Error searching for upgraded version of \"{movie['title']}\": {response.status_code}")
-
+            try:
+                num_search = int(num_search)
+            except ValueError:
+                num_search = 0
+            if num_search > 0:
+                with open('not-cutoff.txt') as f:
+                    titles = f.readlines()
+                random_titles = random.sample(titles, num_search)
+                for title in random_titles:
+                    title = title.strip()
+                    movie = next((m for m in filtered_movies if m['title'] == title), None)
+                    if movie is not None:
+                        search_url = f'{RADARR_URL}/api/v3/command'
+                        search_payload = {'name': 'MoviesSearch', 'movieIds': [movie['id']]}
+                        response = requests.post(search_url, json=search_payload, params={'apiKey': RADARR_API_KEY})
+                        if response.status_code == 201:
+                            print(f"Search for upgraded version of \"{movie['title']}\" has been triggered.")
+                        else:
+                            print(f"Error searching for upgraded version of \"{movie['title']}\": {response.status_code}")
 
 if __name__ == '__main__':
     main()
