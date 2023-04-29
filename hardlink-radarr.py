@@ -6,6 +6,7 @@ import time
 
 RADARR_URL = "http://localhost:7878/radarr"  # Replace with your Radarr URL
 RADARR_API_KEY = "api_key"  # Replace with your Radarr API key
+DIR_PATH = "/path/to/your/movie/directory"  # Replace with your movie directory path
 
 def get_non_hardlinked_files(dir_path):
     non_hardlinked_files = []
@@ -68,7 +69,7 @@ def refresh_movie(movie_id):
 def monitor_and_search_movie(movie_id, movie_file_path):
     
     if not force:
-        user_input = input(f"Delete non-hardlinked movie: {movie_file_path}? (Y/N): ")
+        user_input = input(f"Delete non-hardlinked movie: {movie_file_path}? (y/N): ")
         if user_input.lower() != 'y':
             print("Skipping deletion.")
             return
@@ -101,7 +102,7 @@ def monitor_and_search_movie(movie_id, movie_file_path):
     print(f"\nMonitoring and searching for movie: {movie['title']} (ID: {movie['id']})")
 
 def process_movies(non_hardlinked_files, amount, force=False):
-    print(f"\nLooking for non-hardlinked movies in {dir_path}...\n")
+    print(f"\nLooking for non-hardlinked movies in {DIR_PATH}...\n")
     print(f"Found {len(non_hardlinked_files)} non-hardlinked movies.", end='')
 
     if len(non_hardlinked_files) > 0 and amount > 0:
@@ -124,26 +125,21 @@ def process_movies(non_hardlinked_files, amount, force=False):
             print(f"Movie not found in Radarr for folder path: {folder_path}")
 
 if __name__ == "__main__":
-    if len(sys.argv) < 2:
-        print("Usage: python3 hardlink-radarr.py /path/to/dir [--replace <amount>] [--force]")
-        sys.exit(1)
-
-    dir_path = sys.argv[1]
     csv_file_path = 'non_hardlinked_files.csv'
 
-    non_hardlinked_files = get_non_hardlinked_files(dir_path)
+    non_hardlinked_files = get_non_hardlinked_files(DIR_PATH)
     save_to_csv(non_hardlinked_files, csv_file_path)
 
     force = False
     if '--force' in sys.argv:
         force = True
 
-    if len(sys.argv) > 2 and sys.argv[2] == '--replace':
-        if len(sys.argv) < 4:
-            print("Error: Missing amount. Usage: python3 hardlink-radarr.py /path/to/dir --replace <amount>")
+    if len(sys.argv) > 1 and sys.argv[1] == '--replace':
+        if len(sys.argv) < 3:
+            print("Error: Missing amount. Usage: python3 hardlink-radarr.py --replace <amount>")
             sys.exit(1)
 
-        amount = int(sys.argv[3])
+        amount = int(sys.argv[2])
         non_hardlinked_files = read_from_csv(csv_file_path)
         process_movies(non_hardlinked_files, amount, force)
     else:
