@@ -72,7 +72,7 @@ def monitor_and_search_movie(movie_id, movie_file_path):
         user_input = input(f"Delete non-hardlinked movie: {movie_file_path}? (y/N): ")
         if user_input.lower() != 'y':
             print("Skipping deletion.")
-            return
+            sys.exit(0)
     
     # Delete the movie file
     try:
@@ -104,6 +104,8 @@ def monitor_and_search_movie(movie_id, movie_file_path):
 def process_movies(non_hardlinked_files, amount, force=False):
     print(f"\nLooking for non-hardlinked movies in {DIR_PATH}...\n")
     print(f"Found {len(non_hardlinked_files)} non-hardlinked movies.", end='')
+    if len(non_hardlinked_files) > 0:
+        print(" Saved to non_hardlinked_files.csv", end='')
 
     if len(non_hardlinked_files) > 0 and amount > 0:
         print(f" Replacing {amount} of them.\n")
@@ -124,7 +126,24 @@ def process_movies(non_hardlinked_files, amount, force=False):
         else:
             print(f"Movie not found in Radarr for folder path: {folder_path}")
 
+def show_help():
+    help_text = """Usage: python3 hardlink-radarr.py [options]
+
+Options:
+
+  --replace <amount>   Replace specified amount of non-hardlinked movies
+  --force              Automatically delete non-hardlinked movies without confirmation
+  --help               Display this help text
+  
+  If no flags are specified, the script will only save non-hardlinked movies to non_hardlinked_files.csv
+"""
+    print(help_text)
+
 if __name__ == "__main__":
+    if '--help' in sys.argv:
+        show_help()
+        sys.exit(0)
+
     csv_file_path = 'non_hardlinked_files.csv'
 
     non_hardlinked_files = get_non_hardlinked_files(DIR_PATH)
