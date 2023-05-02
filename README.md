@@ -21,9 +21,6 @@ CATEGORIES = "tv,4ktv,tv.cross-seed" # the categories that you want to search fo
 # Set the tags that you want to add to the matching torrents
 NOHL_EPISODES_TAG = "noHL episodes"
 NOHL_SEASONS_TAG = "noHL seasons"
-
-# Convert the categories string into a list
-CATEGORIES_LIST = [category.strip() for category in CATEGORIES.split(',')]
 ```
 
 ```bash
