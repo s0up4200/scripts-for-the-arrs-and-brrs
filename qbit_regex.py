@@ -7,6 +7,17 @@ QB_URL = "http://127.0.0.1:10923"
 QB_USERNAME = "username"
 QB_PASSWORD = "password"
 
+# Set the tags and category constants
+NOHL_TAG = "noHL" # set this to the tag that identifies your non-hardlinked torrents
+CATEGORIES = "tv,4ktv,tv.cross-seed" # the categories that you want to search for seasons and episodes in
+
+# Set the tags that you want to add to the matching torrents
+NOHL_EPISODES_TAG = "noHL episodes"
+NOHL_SEASONS_TAG = "noHL seasons"
+
+# Convert the categories string into a list
+CATEGORIES_LIST = [category.strip() for category in CATEGORIES.split(',')]
+
 # Parse command line arguments
 parser = argparse.ArgumentParser(description="This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes. It then tags them with \"noHL seasons\" or \"noHL episodes\" respectively.")
 parser.add_argument("--seasons", action="store_true", help="Search for season packs matching the regex pattern.")
@@ -14,19 +25,19 @@ parser.add_argument("--episodes", action="store_true", help="Search for episode 
 args = parser.parse_args()
 
 def has_noHL_tag(tags: str) -> bool:
-    return 'noHL' in tags.split(',')
+    return NOHL_TAG in tags.split(',')
 
 def has_nohl_episodes_or_seasons(tags: str) -> bool:
     tags_list = tags.split(',')
-    return 'noHL episodes' in tags_list or 'noHL seasons' in tags_list
+    return NOHL_EPISODES_TAG in tags_list or NOHL_SEASONS_TAG in tags_list
 
 # Set the regex pattern and the tag based on the command line arguments
 if args.seasons:
     regex_pattern = r"(?i).*s(\d{1,2})\..*"
-    tag = "noHL seasons"
+    tag = NOHL_SEASONS_TAG
 elif args.episodes:
     regex_pattern = r"(?i).*s(\d{1,2}e(\d{1,2}))\..*"
-    tag = "noHL episodes"
+    tag = NOHL_EPISODES_TAG
 else:
     parser.print_help()
     exit()
@@ -55,7 +66,7 @@ except requests.exceptions.JSONDecodeError:
 
 # Find torrent names matching the regex pattern and without both "noHL" and "noHL episodes" or "noHL seasons" tags
 matching_torrent_names = [
-    torrent["name"] for torrent in torrents if re.match(regex_pattern, torrent["name"]) and "noHL" in torrent["tags"] and ("tv" in torrent["category"] or "4ktv" in torrent["category"]) and not (has_noHL_tag(torrent["tags"]) and has_nohl_episodes_or_seasons(torrent["tags"]))
+    torrent["name"] for torrent in torrents if re.match(regex_pattern, torrent["name"]) and NOHL_TAG in torrent["tags"] and any(category in torrent["category"] for category in CATEGORIES_LIST) and not (has_noHL_tag(torrent["tags"]) and has_nohl_episodes_or_seasons(torrent["tags"]))
 ]
 
 # Add the tag to the matching torrents
@@ -66,7 +77,6 @@ for index, name in enumerate(matching_torrent_names):
     if torrent is not None:
         tags = torrent["tags"]
         tags_list = tags.split(",")
-        
         print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
         print(f"Current tags: {tags}")
 
