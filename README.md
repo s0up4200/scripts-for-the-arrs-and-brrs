@@ -7,12 +7,23 @@ This script searches for torrents with the `noHL` tag in qBittorrent and checks 
 It currently looks for the tag `noHL` in these categories: `tv` and `4ktv`.
 The plan is to make these easily configurable to fit each user.
 
-Put in your qbit credentials:
+Put in your qbit credentials and tell it what noHL tag and categories to look for matches in:
 
 ```python
 QB_URL = "http://127.0.0.1:12345"
 QB_USERNAME = "username"
 QB_PASSWORD = "password"
+
+# Set the tags and category constants
+NOHL_TAG = "noHL" # set this to the tag that identifies your non-hardlinked torrents
+CATEGORIES = "tv,4ktv,tv.cross-seed" # the categories that you want to search for seasons and episodes in
+
+# Set the tags that you want to add to the matching torrents
+NOHL_EPISODES_TAG = "noHL episodes"
+NOHL_SEASONS_TAG = "noHL seasons"
+
+# Convert the categories string into a list
+CATEGORIES_LIST = [category.strip() for category in CATEGORIES.split(',')]
 ```
 
 ```bash
