@@ -1,5 +1,25 @@
 # scripts
 
+## qbit-regex.py
+
+This script searches for torrents with the `noHL` tag in qBittorrent and checks if they match a regular expression pattern for either season packs or episodes. It then tags them with noHL seasons or noHL episodes based on what argument you call the script with.
+
+Put in your qbit credentials:
+
+```python
+QB_URL = "http://127.0.0.1:12345"
+QB_USERNAME = "username"
+QB_PASSWORD = "password"
+```
+
+```bash
+python3 qbit-regex.py --episodes
+```
+
+```bash
+python3 qbit-regex.py --seasons
+```
+
 ## hardlink-radarr.py
 
 The point of this script is to make sure everything in Radarr is seeded in your torrent client. Whenever a torrent is deleted from the tracker, programs like [qbit_manage](https://github.com/StuffAnThings/qbit_manage) can automatically delete it from your qBittorrent instance for you.
