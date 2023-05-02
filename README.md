@@ -4,6 +4,9 @@
 
 This script searches for torrents with the `noHL` tag in qBittorrent and checks if they match a regular expression pattern for either season packs or episodes. It then tags them with noHL seasons or noHL episodes based on what argument you call the script with.
 
+It currently looks for the tag `noHL` in these categories: `tv` and `4ktv`.
+The plan is to make these easily configurable to fit each user.
+
 Put in your qbit credentials:
 
 ```python
