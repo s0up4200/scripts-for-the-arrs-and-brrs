@@ -7,7 +7,7 @@ This script searches for torrents with the `noHL` tag in qBittorrent and checks 
 It currently looks for the tag `noHL` in these categories: `tv` and `4ktv`.
 The plan is to make these easily configurable to fit each user.
 
-Put in your qbit credentials and tell it what noHL tag and categories to look for matches in:
+Put in your qbit credentials and tell it what `noHL tag` and categories to look for matches in:
 
 ```python
 QB_URL = "http://127.0.0.1:12345"
