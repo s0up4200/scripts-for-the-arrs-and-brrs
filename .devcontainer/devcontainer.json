@@ -2,6 +2,6 @@
 	"image": "mcr.microsoft.com/devcontainers/universal:linux",
 	"runArgs": ["--device=/dev/net/tun"],
 	"features": {
-	  "ghcr.io/tailscale/codespace/tailscale": {},
+	  "ghcr.io/tailscale/codespace/tailscale": {}
 	}
   }
