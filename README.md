@@ -110,7 +110,7 @@ Alternatively, you can pass these credentials as command-line arguments when run
 --exclude-categories "Category1" "Category2" "Category3"
 ```
 
-## Cross-Seed Post-Processing Script for SABnzbd and NZBGet
+## usenet_xseed.py
 
 This Python script is designed to work as a post-processing script in both SABnzbd and NZBGet. The script creates hardlinks of the completed downloads and performs a cross-seed search using the specified command. If no cross-seeds are found, the hardlinked files will be removed.
 
