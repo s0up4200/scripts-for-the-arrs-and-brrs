@@ -121,23 +121,23 @@ This Python script is designed to work as a post-processing script in both SABnz
 
 ### Installation
 
-1. Save the `xseed.py` script to a folder accessible by SABnzbd or NZBGet, such as the "scripts" folder in their respective installation directories.
-2. Make the script executable: `chmod +x xseed.py`
+1. Save the `usenet_xseed.py` script to a folder accessible by SABnzbd or NZBGet, such as the "scripts" folder in their respective installation directories.
+2. Make the script executable: `chmod +x usenet_xseed.py`
 
 ### Configuration
 
-1. Open the `xseed.py` script in a text editor and set the `DATA_DIR` constant to the path of the directory where you want to store the hardlinked files.
+1. Open the `usenet_xseed.py` script in a text editor and set the `DATA_DIR` constant to the path of the directory where you want to store the hardlinked files.
 
 #### SABnzbd
 
 1. Go to SABnzbd's web interface and navigate to "Settings" > "Categories".
-2. In the "Post-processing" column, select the script "xseed.py" from the dropdown menu for the categories you want to use the script with.
+2. In the "Post-processing" column, select the script "usenet_xseed.py" from the dropdown menu for the categories you want to use the script with.
 3. Save the settings and restart SABnzbd if necessary.
 
 #### NZBGet
 
 1. Go to NZBGet's web interface and navigate to "Settings" > "Categories".
-2. In the "PostScript" column, select the script "xseed.py" from the dropdown menu for the categories you want to use the script with.
+2. In the "PostScript" column, select the script "usenet_xseed.py" from the dropdown menu for the categories you want to use the script with.
 3. Save the settings and reload NZBGet if necessary.
 
 ### Usage
