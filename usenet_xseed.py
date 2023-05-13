@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 ##############################################################################
-### NZBGET/SABNZBD POST-PROCESSING SCRIPT                                          ###
-
+### NZBGET/SABNZBD POST-PROCESSING SCRIPT                                  ###
+#
 # Check for cross-seeds
 #
 # Author: Soup/Roxedus/Thezak/GPT
@@ -12,7 +12,7 @@
 #
 #
 # NOTE: This script requires Python to be installed on your system.
-
+#
 ### NZBGET POST-PROCESSING SCRIPT                                          ###
 ##############################################################################
 
