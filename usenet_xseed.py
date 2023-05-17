@@ -4,7 +4,7 @@
 #
 # Check for cross-seeds
 #
-# Author: Soup/Roxedus/Thezak/GPT
+# Author: Soup/Roxedus/Thezak/GPT/Gabe
 #
 #
 # Copy script to SAB/NZBGet's script folder.
@@ -25,6 +25,10 @@ DATA_DIR = "/path/to/your/data/dir"
 
 # Determine if the script is running in SABnzbd or NZBGet
 NZB_MODE = "sab" if os.environ.get("SAB_COMPLETE_DIR") else "get"
+
+# Determine if the script is running in a Docker container, or bare metal
+def is_running_in_docker():
+    return os.path.exists('/.dockerenv')
 
 # Get the path of the completed download
 if NZB_MODE == "sab":
@@ -49,13 +53,23 @@ for file_name in os.listdir(completed_download_dir):
         os.link(completed_download, hardlink_path)
 
         # Run the cross-seed search
-        cross_seed_command = [
-            "/home/media/.nvm/versions/node/v18.12.1/bin/cross-seed",
-            "search",
-            f"--data-dirs={DATA_DIR}",
-            "--output-dir=.",
-            "--torznab=https://localhost/prowlarr/1/api?apikey=12345",
-        ]
+        if not is_running_in_docker():
+            cross_seed_command = [
+                "/home/media/.nvm/versions/node/v18.12.1/bin/cross-seed",
+                "search",
+                f"--data-dirs={DATA_DIR}",
+                "--output-dir=.",
+                "--torznab=https://localhost/prowlarr/1/api?apikey=12345",
+            ]
+        else:
+            cross_seed_command = [
+                f"docker exec cross-seed",
+                "/usr/local/bin/cross-seed",
+                "search",
+                "--data-dirs={DATA_DIR}",
+                "--output-dir=.",
+                "--torznab=https://localhost/prowlarr/1/api?apikey=12345",
+            ]]
 
         result = subprocess.run(cross_seed_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
