@@ -69,7 +69,7 @@ for file_name in os.listdir(completed_download_dir):
                 "--data-dirs={DATA_DIR}",
                 "--output-dir=.",
                 "--torznab=https://localhost/prowlarr/1/api?apikey=12345",
-            ]]
+            ]
 
         result = subprocess.run(cross_seed_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
 
