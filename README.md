@@ -134,7 +134,7 @@ To have SABNzbd automatically run the script after a download has completed, you
 
 ```bash
 #!/bin/bash
-/usr/bin/python3 /home/yotto/.cross-seedv5/search_hardlinks.py --unattended
+/usr/bin/python3 /home/user/.cross-seedv5/xseed_usenet.py --unattended
 ```
 
 The reason for this bash wrapper is because SAB will try to pass arguments to the script, which Python will not accept. Bash will ignore the arguments and pass the command to Python.
