@@ -12,13 +12,14 @@ RADARR_API_KEY = "api_key"
 RADARR_URL = "http://127.0.0.1:7171/radarr"
 SEARCHED_MOVIES_FILE = "searched_movies.txt"
 
+
 def read_searched_movies():
     searched_movies = {}
 
     try:
-        with open(SEARCHED_MOVIES_FILE, 'r') as f:
+        with open(SEARCHED_MOVIES_FILE, "r") as f:
             for line in f:
-                movie_id, timestamp_str = line.strip().split(',')
+                movie_id, timestamp_str = line.strip().split(",")
                 timestamp = datetime.strptime(timestamp_str, "%Y-%m-%dT%H:%M:%S")
                 searched_movies[int(movie_id)] = timestamp
     except FileNotFoundError:
@@ -26,15 +27,22 @@ def read_searched_movies():
 
     return searched_movies
 
+
 def write_searched_movies(searched_movies):
-    with open(SEARCHED_MOVIES_FILE, 'w') as f:
+    with open(SEARCHED_MOVIES_FILE, "w") as f:
         for movie_id, timestamp in searched_movies.items():
             timestamp_str = timestamp.strftime("%Y-%m-%dT%H:%M:%S")
             f.write(f"{movie_id},{timestamp_str}\n")
 
+
 def remove_old_searched_movies(searched_movies):
     cutoff_time = datetime.now() - timedelta(hours=12)
-    return {movie_id: timestamp for movie_id, timestamp in searched_movies.items() if timestamp >= cutoff_time}
+    return {
+        movie_id: timestamp
+        for movie_id, timestamp in searched_movies.items()
+        if timestamp >= cutoff_time
+    }
+
 
 def search_missing_movies(api_key, base_url, max_movies_to_search):
     # Read the searched_movies file and remove old entries
@@ -61,7 +69,21 @@ def search_missing_movies(api_key, base_url, max_movies_to_search):
     current_date = datetime.now().date()
 
     # Filter out movies that are not monitored, not missing, or don't have a physical/digital release
-    available_missing_movies = [movie for movie in all_movies if movie['monitored'] and not movie['hasFile'] and movie['status'] == 'released' and ('physicalRelease' in movie and datetime.strptime(movie['physicalRelease'], "%Y-%m-%dT%H:%M:%SZ").date() <= current_date or 'digitalRelease' in movie and datetime.strptime(movie['digitalRelease'], "%Y-%m-%dT%H:%M:%SZ").date() <= current_date)]
+    available_missing_movies = [
+        movie
+        for movie in all_movies
+        if movie["monitored"]
+        and not movie["hasFile"]
+        and movie["status"] == "released"
+        and (
+            "physicalRelease" in movie
+            and datetime.strptime(movie["physicalRelease"], "%Y-%m-%dT%H:%M:%SZ").date()
+            <= current_date
+            or "digitalRelease" in movie
+            and datetime.strptime(movie["digitalRelease"], "%Y-%m-%dT%H:%M:%SZ").date()
+            <= current_date
+        )
+    ]
 
     # Perform a search for each missing movie (up to the maximum specified)
     count = 0
@@ -93,6 +115,7 @@ def search_missing_movies(api_key, base_url, max_movies_to_search):
         print("No missing movies found.")
     else:
         print(f"Search triggered for {count} movie(s).")
+
 
 if __name__ == "__main__":
     if len(sys.argv) != 2:

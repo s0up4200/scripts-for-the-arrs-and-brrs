@@ -110,39 +110,33 @@ Alternatively, you can pass these credentials as command-line arguments when run
 --exclude-categories "Category1" "Category2" "Category3"
 ```
 
-## usenet_xseed.py
+# Cross-Seed Usenet script (xseed_usenet.py)
 
-This Python script is designed to work as a post-processing script in both SABnzbd and NZBGet. The script creates hardlinks of the completed downloads and performs a cross-seed search using the specified command. If no cross-seeds are found, the hardlinked files will be removed.
+This script is designed to help you automate the process of hardlinking and triggering cross-seed searches for Usenet downloads.
 
-### Requirements
+## What does it do?
 
-1. Python 3 installed on your system.
-2. The `cross-seed` command should be installed and configured on your system. Adjust the path to the `cross-seed` command in the script if necessary.
+1. **Finds** all non-hardlinked `.mkv` and `.mp4` files in your completed Usenet downloads directory.
+2. **Asks** if you want to hardlink these (if any were found) to a specified directory. If none were found, it skips to the next step.
+3. **Asks** if you want to trigger a cross-seed search in the specified directory.
 
-### Installation
+In **unattended mode**, the script will not ask for any confirmations and will proceed with hardlinking and triggering the cross-seed search.
 
-1. Save the `usenet_xseed.py` script to a folder accessible by SABnzbd or NZBGet, such as the "scripts" folder in their respective installation directories.
-2. Make the script executable: `chmod +x usenet_xseed.py`
+## How to use it
 
-### Configuration
+```bash
+python3 xseed_usenet.py
+```
 
-1. Open the `usenet_xseed.py` script in a text editor and set the `DATA_DIR` constant to the path of the directory where you want to store the hardlinked files.
+You can also use the `--unattended` flag or set `unattended = True` in the script to run without user interaction.
 
-#### SABnzbd
+To have SABNzbd automatically run the script after a download has completed, you can add the following to your SABNzbd post-processing scripts:
 
-1. Go to SABnzbd's web interface and navigate to "Settings" > "Categories".
-2. In the "Post-processing" column, select the script "usenet_xseed.py" from the dropdown menu for the categories you want to use the script with.
-3. Save the settings and restart SABnzbd if necessary.
+```bash
+#!/bin/bash
+/usr/bin/python3 /home/yotto/.cross-seedv5/search_hardlinks.py --unattended
+```
 
-#### NZBGet
+The reason for this bash wrapper is because SAB will try to pass arguments to the script, which Python will not accept. Bash will ignore the arguments and pass the command to Python.
 
-1. Go to NZBGet's web interface and navigate to "Settings" > "Categories".
-2. In the "PostScript" column, select the script "usenet_xseed.py" from the dropdown menu for the categories you want to use the script with.
-3. Save the settings and reload NZBGet if necessary.
-
-### Usage
-
-The script will run automatically after each download is completed for the categories you have configured in SABnzbd or NZBGet. It will create hardlinks, perform a cross-seed search, and remove the hardlinks if no cross-seeds are found.
-
-
-
+This will not handle season packs at this time.

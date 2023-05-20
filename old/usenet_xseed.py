@@ -26,9 +26,11 @@ DATA_DIR = "/path/to/your/data/dir"
 # Determine if the script is running in SABnzbd or NZBGet
 NZB_MODE = "sab" if os.environ.get("SAB_COMPLETE_DIR") else "get"
 
+
 # Determine if the script is running in a Docker container, or bare metal
 def is_running_in_docker():
-    return os.path.exists('/.dockerenv')
+    return os.path.exists("/.dockerenv")
+
 
 # Get the path of the completed download
 if NZB_MODE == "sab":
@@ -71,7 +73,12 @@ for file_name in os.listdir(completed_download_dir):
                 "--torznab=https://localhost/prowlarr/1/api?apikey=12345",
             ]
 
-        result = subprocess.run(cross_seed_command, stdout=subprocess.PIPE, stderr=subprocess.PIPE, text=True)
+        result = subprocess.run(
+            cross_seed_command,
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            text=True,
+        )
 
         # Check for search results
         if "No cross-seeds found" in result.stdout:
@@ -86,4 +93,3 @@ for file_name in os.listdir(completed_download_dir):
 
 # Exit with a success status
 sys.exit(POSTPROCESS_SUCCESS)
-

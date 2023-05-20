@@ -1,3 +1,10 @@
+#!/usr/bin/env python3
+
+"""
+Author: soup
+Description: This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes. It then tags them with "noHL seasons" or "noHL episodes" or "noHL unmatched" respectively.
+"""
+
 import requests
 import argparse
 import re
@@ -17,21 +24,37 @@ NOHL_SEASONS_TAG = "noHL seasons"
 NOHL_UNMATCHED_TAG = "noHL unmatched"
 
 # Convert the categories string into a list
-CATEGORIES_LIST = [category.strip() for category in CATEGORIES.split(',')]
+CATEGORIES_LIST = [category.strip() for category in CATEGORIES.split(",")]
+
 
 def has_noHL_tag(tags: str) -> bool:
-    return NOHL_TAG in tags.split(',')
+    return NOHL_TAG in tags.split(",")
 
 
 def has_nohl_episodes_or_seasons(tags: str) -> bool:
-    tags_list = tags.split(',')
+    tags_list = tags.split(",")
     return NOHL_EPISODES_TAG in tags_list or NOHL_SEASONS_TAG in tags_list
 
+
 # Parse command line arguments
-parser = argparse.ArgumentParser(description="This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes. It then tags them with \"noHL seasons\" or \"noHL episodes\" or \"noHL unmatched\" respectively.")
-parser.add_argument("--seasons", action="store_true", help="Search for season packs matching the regex pattern.")
-parser.add_argument("--episodes", action="store_true", help="Search for episode packs matching the regex pattern.")
-parser.add_argument("--unmatched", action="store_true", help="Tag torrents that do not match the season or episode patterns.")
+parser = argparse.ArgumentParser(
+    description='This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes. It then tags them with "noHL seasons" or "noHL episodes" or "noHL unmatched" respectively.'
+)
+parser.add_argument(
+    "--seasons",
+    action="store_true",
+    help="Search for season packs matching the regex pattern.",
+)
+parser.add_argument(
+    "--episodes",
+    action="store_true",
+    help="Search for episode packs matching the regex pattern.",
+)
+parser.add_argument(
+    "--unmatched",
+    action="store_true",
+    help="Tag torrents that do not match the season or episode patterns.",
+)
 args = parser.parse_args()
 
 # Set the regex pattern and the tag based on the command line arguments
@@ -76,27 +99,46 @@ for index, torrent in enumerate(torrents):
     torrent_name = torrent["name"]
 
     # Check if the torrent has the "noHL" tag and belongs to one of the specified categories
-    if NOHL_TAG in torrent["tags"] and any(category in torrent["category"] for category in CATEGORIES_LIST):
+    if NOHL_TAG in torrent["tags"] and any(
+        category in torrent["category"] for category in CATEGORIES_LIST
+    ):
         tags = torrent["tags"]
         tags_list = tags.split(",")
 
         updated_tags_list = tags_list.copy()
 
         # Check for seasons and update tags if not present
-        if args.seasons and re.match(r"(?i).*\bS\d+\b(?!E\d+\b).*", torrent_name) and NOHL_SEASONS_TAG not in tags_list:
+        if (
+            args.seasons
+            and re.match(r"(?i).*\bS\d+\b(?!E\d+\b).*", torrent_name)
+            and NOHL_SEASONS_TAG not in tags_list
+        ):
             updated_tags_list.append(NOHL_SEASONS_TAG)
 
         # Check for episodes and update tags if not present
-        if args.episodes and re.match(r"(?i).*\bS\d+(?=E\d+\b).*", torrent_name) and NOHL_EPISODES_TAG not in tags_list:
+        if (
+            args.episodes
+            and re.match(r"(?i).*\bS\d+(?=E\d+\b).*", torrent_name)
+            and NOHL_EPISODES_TAG not in tags_list
+        ):
             updated_tags_list.append(NOHL_EPISODES_TAG)
 
         # Check for unmatched and update tags if not present
-        if args.unmatched and not re.match(r"(?i)(?=.*\bS\d+\b(?!E\d+\b)|.*\bS\d+(?=E\d+\b)).*", torrent_name) and NOHL_UNMATCHED_TAG not in tags_list:
+        if (
+            args.unmatched
+            and not re.match(
+                r"(?i)(?=.*\bS\d+\b(?!E\d+\b)|.*\bS\d+(?=E\d+\b)).*", torrent_name
+            )
+            and NOHL_UNMATCHED_TAG not in tags_list
+        ):
             updated_tags_list.append(NOHL_UNMATCHED_TAG)
 
         # Update tags if there are any changes
         if updated_tags_list != tags_list:
             print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
             print(f"Current tags: {tags}")
-            session.post(f"{QB_URL}/api/v2/torrents/addTags", data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)})
+            session.post(
+                f"{QB_URL}/api/v2/torrents/addTags",
+                data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
+            )
             print(f"Updated tags: {','.join(updated_tags_list)}\n")
