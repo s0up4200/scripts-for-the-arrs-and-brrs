@@ -48,7 +48,7 @@ parser.add_argument(
 parser.add_argument(
     "--episodes",
     action="store_true",
-    help="Search for episode packs matching the regex pattern.",
+    help="Search for episodes matching the regex pattern.",
 )
 parser.add_argument(
     "--unmatched",
