@@ -110,11 +110,11 @@ Alternatively, you can pass these credentials as command-line arguments when run
 --exclude-categories "Category1" "Category2" "Category3"
 ```
 
-# Cross-Seed Usenet script (xseed_usenet.py)
+## Cross-Seed Usenet script (xseed_usenet.py)
 
 This script is designed to help you automate the process of hardlinking and triggering cross-seed searches for Usenet downloads.
 
-## What does it do?
+### What does it do?
 
 1. **Finds** all non-hardlinked `.mkv` and `.mp4` files in your completed Usenet downloads directory.
 2. **Asks** if you want to hardlink these (if any were found) to a specified directory. If none were found, it skips to the next step.
@@ -122,7 +122,7 @@ This script is designed to help you automate the process of hardlinking and trig
 
 In **unattended mode**, the script will not ask for any confirmations and will proceed with hardlinking and triggering the cross-seed search.
 
-## How to use it
+### How to use it
 
 ```bash
 python3 xseed_usenet.py
