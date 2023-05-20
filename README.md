@@ -118,7 +118,7 @@ This script is designed to help you automate the process of hardlinking and trig
 
 1. **Finds** all non-hardlinked `.mkv` and `.mp4` files in your completed Usenet downloads directory.
 2. **Asks** if you want to hardlink these (if any were found) to a specified directory. If none were found, it skips to the next step.
-3. **Asks** if you want to trigger a cross-seed search in the specified directory.
+3. **Asks** if you want to trigger a cross-seed search in the specified destination directory.
 
 In **unattended mode**, the script will not ask for any confirmations and will proceed with hardlinking and triggering the cross-seed search.
 
