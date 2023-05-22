@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 ##############################################################################
-### NZBGET POST-PROCESSING SCRIPT                                          ###
+### SABNZBD/NZBGET POST-PROCESSING SCRIPT                                  ###
 
 # Check for cross-seeds
 #
@@ -9,13 +9,13 @@
 #
 # Script to automate hardlinking and cross-seeding for Usenet downloads.
 #
-# Copy script to NZBGet's script folder.
+# Copy script to SAB/NZBGet's script folder.
 # Run sudo chmod +x xseed_usenet.py
 #
 #
 # NOTE: This script requires Python to be installed on your system.
 
-### NZBGET POST-PROCESSING SCRIPT                                          ###
+### SABNZBD/NZBGET POST-PROCESSING SCRIPT                                  ###
 ##############################################################################
 
 import os
