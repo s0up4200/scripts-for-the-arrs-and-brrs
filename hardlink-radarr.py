@@ -22,7 +22,7 @@ def get_non_hardlinked_files(dir_path):
 
     for root, dirs, files in os.walk(dir_path):
         for file in files:
-            if file.endswith(".mkv"):
+            if file.endswith(".mkv" or ".mp4"):
                 file_path = os.path.join(root, file)
                 if os.path.isfile(file_path) and os.stat(file_path).st_nlink == 1:
                     non_hardlinked_files.append(file_path)
