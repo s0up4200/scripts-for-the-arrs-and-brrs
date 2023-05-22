@@ -64,7 +64,7 @@ if __name__ == "__main__":
     parser.add_argument(
         "--unattended", action="store_true", help="run script without user interaction"
     )
-    args = parser.parse_args()
+    args, unknown = parser.parse_known_args()
 
     unattended = unattended or args.unattended
 
