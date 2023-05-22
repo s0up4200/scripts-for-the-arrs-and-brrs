@@ -2,6 +2,7 @@ import qbittorrentapi
 import sys
 import csv
 import argparse
+import os
 
 """
 Author: soup
@@ -11,9 +12,10 @@ Description: Script to calculate and display average ratios of torrents in categ
 # Requirements: pip3 install qbittorrent-api
 
 # Add your qBittorrent Web UI credentials here or call them from the command line
-QBITTORRENT_HOST = "http://localhost:8080"
-QBITTORRENT_USERNAME = "my_username"
-QBITTORRENT_PASSWORD = "my_password"
+# Environment variables are used by default if not specified here or on the command line
+QB_URL = os.environ.get("QB_URL", "http://localhost:8080")
+QB_USERNAME = os.environ.get("QB_USERNAME", "my_username")
+QB_PASSWORD = os.environ.get("QB_PASSWORD", "my_password")
 
 
 def login_qbittorrent_client(host, username, password):
@@ -154,20 +156,20 @@ def parse_arguments():
     parser.add_argument(
         "--host",
         type=str,
-        default=QBITTORRENT_HOST,
-        help=f"qBittorrent Web UI host (default: {QBITTORRENT_HOST})",
+        default=QB_URL,
+        help=f"qBittorrent Web UI host (default: {QB_URL})",
     )
     parser.add_argument(
         "--username",
         type=str,
-        default=QBITTORRENT_USERNAME,
-        help=f"qBittorrent Web UI username (default: {QBITTORRENT_USERNAME})",
+        default=QB_USERNAME,
+        help=f"qBittorrent Web UI username (default: {QB_USERNAME})",
     )
     parser.add_argument(
         "--password",
         type=str,
-        default=QBITTORRENT_PASSWORD,
-        help=f"qBittorrent Web UI password (default: {QBITTORRENT_PASSWORD})",
+        default=QB_PASSWORD,
+        help=f"qBittorrent Web UI password (default: {QB_PASSWORD})",
     )
     parser.add_argument("--tags-only", action="store_true",
                         help="Only export tags")

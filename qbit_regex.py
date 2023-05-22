@@ -9,10 +9,11 @@ import requests
 import argparse
 import re
 
-# Set your qBittorrent Web UI URL and credentials
-QB_URL = "http://127.0.0.1:10923"
-QB_USERNAME = "username"
-QB_PASSWORD = "password"
+# Add your qBittorrent Web UI credentials here or call them from the command line
+# Environment variables are used by default if not specified here or on the command line
+QB_URL = os.environ.get("QB_URL", "http://localhost:8080")
+QB_USERNAME = os.environ.get("QB_USERNAME", "my_username")
+QB_PASSWORD = os.environ.get("QB_PASSWORD", "my_password")
 
 # Set the tags and category constants
 NOHL_TAG = "noHL"  # set this to the tag that identifies your non-hardlinked torrents
