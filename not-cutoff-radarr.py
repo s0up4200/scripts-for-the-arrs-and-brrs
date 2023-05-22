@@ -115,26 +115,6 @@ def monitor_filtered_movies(filtered_movies):
     return unmonitored_count, filtered_count
 
 
-def print_summary_statement(unmonitored_count, filtered_count):
-    if unmonitored_count == 0:
-        print(
-            f'{filtered_count} movies do not have the custom format "{CUSTOM_FORMAT_NAME}" assigned. They are already monitored.'
-        )
-    else:
-        print(
-            f'{filtered_count} movies do not have the custom format "{CUSTOM_FORMAT_NAME}" assigned.'
-        )
-
-    if unmonitored_count == 1:
-        print(
-            f"There was {unmonitored_count} unmonitored movie out of the {filtered_count}, it is now being monitored."
-        )
-    elif unmonitored_count > 1:
-        print(
-            f"There were {unmonitored_count} unmonitored movies out of the {filtered_count}, they are now being monitored."
-        )
-
-
 def parse_args():
     parser = argparse.ArgumentParser(
         description="Check for custom format, monitor, and search for upgrades in Radarr."
@@ -166,6 +146,11 @@ def main():
     else:
         movies = fetch_movies()
         filtered_movies = filter_movies(movies, custom_format_id)
+
+        # Add this line to print the total count of filtered movies
+        print(
+            f"Found {len(filtered_movies)} movies without the custom format '{CUSTOM_FORMAT_NAME}'."
+        )
 
         if args.unattended is None:
             save_answer = input(
