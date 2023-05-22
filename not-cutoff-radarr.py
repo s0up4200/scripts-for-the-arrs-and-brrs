@@ -3,6 +3,7 @@ from datetime import datetime
 import random
 import sys
 import argparse
+import os
 
 """
 Author: soup
@@ -10,8 +11,12 @@ Description: This script will check for movies in Radarr that do not have the gi
 It then asks you if you want to trigger a search for upgrades for those movies. It will ask you how many movies you want to search for.
 """
 
-RADARR_URL = "http://localhost:7878/radarr"  # Change this to your Radarr URL
-RADARR_API_KEY = "api_key"  # Change this to your Radarr API key
+RADARR_URL = os.getenv(
+    "RADARR_URL", "http://localhost:7878/radarr"
+)  # Change this to your Radarr URL
+RADARR_API_KEY = os.getenv(
+    "RADARR_API_KEY", "api_key"
+)  # Change this to your Radarr API key
 CUSTOM_FORMAT_NAME = "HD Bluray Tier 01"  # Change this to the name of the custom format you want to filter by
 
 
