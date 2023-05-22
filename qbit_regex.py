@@ -8,6 +8,7 @@ Description: This script looks for torrents with the noHL tag in qBittorent and 
 import requests
 import argparse
 import re
+import os
 
 # Add your qBittorrent Web UI credentials here or call them from the command line
 # Environment variables are used by default if not specified here or on the command line
@@ -85,8 +86,8 @@ print(f"Auth response text: {auth_response.text}")
 # Get the list of torrents
 response = session.get(f"{QB_URL}/api/v2/torrents/info", verify=False)
 
-#print(f"Torrents status code: {response.status_code}")
-#print(f"Torrents response text: {response.text}")
+# print(f"Torrents status code: {response.status_code}")
+# print(f"Torrents response text: {response.text}")
 
 print("Please wait...")
 
@@ -146,8 +147,8 @@ for index, torrent in enumerate(torrents):
 
         # Update tags if there are any changes
         if updated_tags_list != tags_list:
-            #print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
-            #print(f"Current tags: {tags}")
+            # print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
+            # print(f"Current tags: {tags}")
             session.post(
                 f"{QB_URL}/api/v2/torrents/addTags",
                 data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
