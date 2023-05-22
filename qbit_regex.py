@@ -84,14 +84,21 @@ print(f"Auth response text: {auth_response.text}")
 # Get the list of torrents
 response = session.get(f"{QB_URL}/api/v2/torrents/info", verify=False)
 
-print(f"Torrents status code: {response.status_code}")
-print(f"Torrents response text: {response.text}")
+#print(f"Torrents status code: {response.status_code}")
+#print(f"Torrents response text: {response.text}")
+
+print("Please wait...")
 
 try:
     torrents = response.json()
 except requests.exceptions.JSONDecodeError:
     print("Failed to decode JSON.")
     torrents = []
+
+# Add counters for each tag
+nohl_seasons_count = 0
+nohl_episodes_count = 0
+nohl_unmatched_count = 0
 
 # Process the torrents
 total_torrents = len(torrents)
@@ -114,6 +121,7 @@ for index, torrent in enumerate(torrents):
             and NOHL_SEASONS_TAG not in tags_list
         ):
             updated_tags_list.append(NOHL_SEASONS_TAG)
+            nohl_seasons_count += 1
 
         # Check for episodes and update tags if not present
         if (
@@ -122,6 +130,7 @@ for index, torrent in enumerate(torrents):
             and NOHL_EPISODES_TAG not in tags_list
         ):
             updated_tags_list.append(NOHL_EPISODES_TAG)
+            nohl_episodes_count += 1
 
         # Check for unmatched and update tags if not present
         if (
@@ -132,13 +141,24 @@ for index, torrent in enumerate(torrents):
             and NOHL_UNMATCHED_TAG not in tags_list
         ):
             updated_tags_list.append(NOHL_UNMATCHED_TAG)
+            nohl_unmatched_count += 1
 
         # Update tags if there are any changes
         if updated_tags_list != tags_list:
-            print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
-            print(f"Current tags: {tags}")
+            #print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
+            #print(f"Current tags: {tags}")
             session.post(
                 f"{QB_URL}/api/v2/torrents/addTags",
                 data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
             )
-            print(f"Updated tags: {','.join(updated_tags_list)}\n")
+
+# Print the summary at the end
+total_processed = nohl_seasons_count + nohl_episodes_count + nohl_unmatched_count
+print(f"Total torrents processed: {total_processed} out of {total_torrents}")
+
+if args.seasons:
+    print(f"Tagged {nohl_seasons_count} torrents with '{NOHL_SEASONS_TAG}'")
+if args.episodes:
+    print(f"Tagged {nohl_episodes_count} torrents with '{NOHL_EPISODES_TAG}'")
+if args.unmatched:
+    print(f"Tagged {nohl_unmatched_count} torrents with '{NOHL_UNMATCHED_TAG}'")
