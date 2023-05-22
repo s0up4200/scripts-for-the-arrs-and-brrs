@@ -1,12 +1,26 @@
 #!/usr/bin/env python3
+##############################################################################
+### NZBGET POST-PROCESSING SCRIPT                                          ###
 
-"""
-Author: soup
-Description: Script to automate hardlinking and cross-seeding for Usenet downloads.
-"""
+# Check for cross-seeds
+#
+# Author: Soup
+#
+#
+# Script to automate hardlinking and cross-seeding for Usenet downloads.
+#
+# Copy script to NZBGet's script folder.
+# Run sudo chmod +x xseed_usenet.py
+#
+#
+# NOTE: This script requires Python to be installed on your system.
+
+### NZBGET POST-PROCESSING SCRIPT                                          ###
+##############################################################################
 
 import os
 import requests
+import sys
 from pathlib import Path
 import argparse
 
@@ -17,6 +31,26 @@ cross_base_url = (
 )
 dest_path = "/home/user/torrents/qbittorrent/usenet/"  # replace with the path where you want to create hardlinks
 unattended = False  # set to True to run without user interaction
+
+# Determine if the script is running in SABnzbd or NZBGet
+NZB_MODE = "sab" if os.environ.get("SAB_COMPLETE_DIR") else "get"
+
+# Get the path of the completed download
+if NZB_MODE == "sab":
+    unattended = True
+    base_path = os.environ.get("SAB_COMPLETE_DIR")
+    POSTPROCESS_SUCCESS = 0
+    POSTPROCESS_ERROR = 1
+
+elif NZB_MODE == "get":
+    unattended = True
+    base_path = os.environ.get("NZBPP_DIRECTORY")
+    POSTPROCESS_SUCCESS = 93
+    POSTPROCESS_ERROR = 94
+
+else:
+    POSTPROCESS_SUCCESS = 0
+    POSTPROCESS_ERROR = 1
 
 
 def find_files(path: Path, extensions: tuple):
@@ -40,8 +74,10 @@ def send_webhook(url: str, directory_path: str):
     response = requests.post(url + "/api/webhook", data=data)
     if response.status_code == 204:
         print("Trigger sent successfully.")
+        sys.exit(POSTPROCESS_SUCCESS)
     else:
         print("Trigger failed.")
+        sys.exit(POSTPROCESS_ERROR)
 
 
 def user_prompt(question, default="no"):
@@ -69,6 +105,7 @@ if __name__ == "__main__":
     unattended = unattended or args.unattended
 
     files = list(find_files(Path(base_path), (".mkv", ".mp4")))
+    
     print(f"{len(files)} non-hardlinked movies found.")
 
     if len(files) > 0:

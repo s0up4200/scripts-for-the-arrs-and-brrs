@@ -130,13 +130,6 @@ python3 xseed_usenet.py
 
 You can also use the `--unattended` flag or set `unattended = True` in the script to run without user interaction.
 
-To have SABNzbd automatically run the script after a download has completed, you can add the following to your SABNzbd post-processing scripts:
-
-```bash
-#!/bin/bash
-/usr/bin/python3 /home/user/.cross-seedv5/xseed_usenet.py --unattended
-```
-
-The reason for this bash wrapper is because SAB will try to pass arguments to the script, which Python will not accept. Bash will ignore the arguments and pass the command to Python.
+The script will automatically run in unattended mode if triggered by NZBGet or SABnzbd
 
 This will not handle season packs at this time.
