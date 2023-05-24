@@ -17,7 +17,10 @@ RADARR_URL = os.getenv(
 RADARR_API_KEY = os.getenv(
     "RADARR_API_KEY", "api_key"
 )  # Change this to your Radarr API key
-CUSTOM_FORMAT_NAME = "HD Bluray Tier 01"  # Change this to the name of the custom format you want to filter by
+CUSTOM_FORMAT_NAMES = [
+    "HD Bluray Tier 01",
+    "HD Bluray Tier 02",
+]  # Change this to the names of the custom formats you want to filter by
 
 
 def is_movie_available(movie):
@@ -64,11 +67,16 @@ def fetch_custom_formats():
         return []
 
 
-def find_custom_format_id(custom_formats, custom_format_name):
-    for custom_format in custom_formats:
-        if custom_format["name"] == custom_format_name:
-            return custom_format["id"]
-    return None
+def find_custom_format_ids(custom_formats, custom_format_names):
+    custom_format_ids = []
+    for custom_format_name in custom_format_names:
+        for custom_format in custom_formats:
+            if custom_format["name"] == custom_format_name:
+                custom_format_ids.append(custom_format["id"])
+                break
+        else:
+            print(f'Error: Custom format "{custom_format_name}" not found')
+    return custom_format_ids
 
 
 def fetch_movies():
@@ -82,11 +90,12 @@ def fetch_movies():
         return []
 
 
-def filter_movies(movies, custom_format_id):
+def filter_movies(movies, custom_format_ids, match):
     filtered_movies = []
     for movie in movies:
         if not is_movie_available(movie):
             continue
+        movie_custom_format_ids = []  # default to empty list
         if "movieFile" in movie:
             movie_file_response = requests.get(
                 f'{RADARR_URL}/api/v3/moviefile/{movie["movieFile"]["id"]}',
@@ -94,16 +103,25 @@ def filter_movies(movies, custom_format_id):
             )
             if movie_file_response.status_code == 200:
                 movie_file = movie_file_response.json()
-                if custom_format_id not in [
+                movie_custom_format_ids = [
                     format["id"] for format in movie_file.get("customFormats", [])
-                ]:
-                    filtered_movies.append(movie)
+                ]
             else:
                 print(
                     f'Error fetching movie file for {movie["title"]}: {movie_file_response.status_code}'
                 )
+        if match == "any":
+            if not any(
+                custom_format_id in movie_custom_format_ids
+                for custom_format_id in custom_format_ids
+            ):
+                filtered_movies.append(movie)
         else:
-            filtered_movies.append(movie)
+            if not all(
+                custom_format_id in movie_custom_format_ids
+                for custom_format_id in custom_format_ids
+            ):
+                filtered_movies.append(movie)
     return filtered_movies
 
 
@@ -130,31 +148,38 @@ def parse_args():
         metavar="N",
         help="Run the script unattended and search for N movies at the end without user interaction.",
     )
+    parser.add_argument(
+        "--match",
+        choices=["any", "all"],
+        default="all",
+        help="Choose whether any or all custom formats need to match ('any' or 'all' defaults to 'all').",
+    )
 
     return parser.parse_args()
 
 
 def main():
     # If the script is not called with --help or -h, print the check statement
+    args = parse_args()
     if all(arg not in sys.argv for arg in ("--help", "-h")):
         print(
-            f'Checking for movies in Radarr that do not have the custom format "{CUSTOM_FORMAT_NAME}" assigned and are considered available...'
+            f'Checking for movies in Radarr that do not have {args.match} of the custom formats "{CUSTOM_FORMAT_NAMES}" assigned and are considered available...'
         )
 
     args = parse_args()
 
     custom_formats = fetch_custom_formats()
-    custom_format_id = find_custom_format_id(custom_formats, CUSTOM_FORMAT_NAME)
+    custom_format_ids = find_custom_format_ids(custom_formats, CUSTOM_FORMAT_NAMES)
 
-    if custom_format_id is None:
-        print(f'Error: Custom format "{CUSTOM_FORMAT_NAME}" not found')
+    if not custom_format_ids:
+        print(f"Error: None of the custom formats {CUSTOM_FORMAT_NAMES} were found")
     else:
         movies = fetch_movies()
-        filtered_movies = filter_movies(movies, custom_format_id)
+        filtered_movies = filter_movies(movies, custom_format_ids, args.match)
 
         # Add this line to print the total count of filtered movies
         print(
-            f"Found {len(filtered_movies)} movies without the custom format '{CUSTOM_FORMAT_NAME}'."
+            f"Found {len(filtered_movies)} movies without the custom format '{CUSTOM_FORMAT_NAMES}'."
         )
 
         if args.unattended is None:
