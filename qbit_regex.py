@@ -80,6 +80,10 @@ parser.add_argument(
 )
 args = parser.parse_args()
 
+if not (args.seasons or args.episodes or args.unmatched or args.all):
+    parser.print_help()
+    exit()
+
 if args.all:
     args.seasons = args.episodes = args.unmatched = True
 
