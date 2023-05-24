@@ -106,14 +106,16 @@ nohl_unmatched_count = 0
 total_torrents = len(torrents)
 for index, torrent in enumerate(torrents):
     torrent_name = torrent["name"]
-    tags = torrent["tags"]
-    tags_list = tags.split(",")
-    updated_tags_list = tags_list.copy()
 
     # Check if the torrent has the "noHL" tag and belongs to one of the specified categories
     if NOHL_TAG in torrent["tags"] and any(
         category in torrent["category"] for category in CATEGORIES_LIST
     ):
+        tags = torrent["tags"]
+        tags_list = tags.split(",")
+
+        updated_tags_list = tags_list.copy()
+
         # Check for seasons and update tags if not present
         if (
             args.seasons
@@ -143,25 +145,14 @@ for index, torrent in enumerate(torrents):
             updated_tags_list.append(NOHL_UNMATCHED_TAG)
             nohl_unmatched_count += 1
 
-    # If the torrent does not have the "noHL" tag but has any of the noHL categories, remove the noHL category tags
-    else:
-        if NOHL_EPISODES_TAG in updated_tags_list:
-            updated_tags_list.remove(NOHL_EPISODES_TAG)
-            nohl_episodes_count -= 1
-        if NOHL_SEASONS_TAG in updated_tags_list:
-            updated_tags_list.remove(NOHL_SEASONS_TAG)
-            nohl_seasons_count -= 1
-        if NOHL_UNMATCHED_TAG in updated_tags_list:
-            updated_tags_list.remove(NOHL_UNMATCHED_TAG)
-            nohl_unmatched_count -= 1
-
-    # Update tags if there are any changes
-    if updated_tags_list != tags_list:
-        session.post(
-            f"{QB_URL}/api/v2/torrents/addTags",
-            data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
-        )
-
+        # Update tags if there are any changes
+        if updated_tags_list != tags_list:
+            # print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
+            # print(f"Current tags: {tags}")
+            session.post(
+                f"{QB_URL}/api/v2/torrents/addTags",
+                data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
+            )
 
 # Print the summary at the end
 total_processed = nohl_seasons_count + nohl_episodes_count + nohl_unmatched_count
