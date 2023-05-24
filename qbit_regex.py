@@ -1,15 +1,19 @@
 #!/usr/bin/env python3
 
+"""
+Author: soup
+
+This script manages torrents in qBittorrent. It identifies torrents with the noHL tag 
+and checks if they align with a regex pattern for either season packs or episodes. 
+Subsequently, the matching torrents are tagged as "noHL seasons", "noHL episodes", 
+or "noHL unmatched", respectively.
+"""
+
 import argparse
 import re
 import os
 import time
 import requests
-
-# Author: soup
-# Description: This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes.
-# It then tags them with "noHL seasons" or "noHL episodes" or "noHL unmatched" respectively.
-
 
 # Add your qBittorrent Web UI credentials here or call them from the command line
 # Environment variables are used by default if not specified here or on the command line
@@ -19,7 +23,7 @@ QB_PASSWORD = os.environ.get("QB_PASSWORD", "my_password")
 
 # Set the tags and category constants
 NOHL_TAG = "noHL"  # set this to the tag that identifies your non-hardlinked torrents
-CATEGORIES = "tv,4ktv,tv.cross-seed"  # the categories that you want to search for seasons and episodes in
+CATEGORIES = "tv,4ktv,tv.cross-seed"  # the categories that you want to search in
 
 # Set the tags that you want to add to the matching torrents
 NOHL_EPISODES_TAG = "noHL episodes"
@@ -28,6 +32,16 @@ NOHL_UNMATCHED_TAG = "noHL unmatched"
 
 
 def delete_tags():
+    """
+    Deletes specific tags before processing the torrents.
+    This is to ensure that the torrents that are no longer
+    tagged with noHL are removed from the equation.
+
+    It only deletes the following tags:
+    NOHL_EPISODES_TAG
+    NOHL_SEASONS_TAG
+    NOHL_UNMATCHED_TAG
+    """
     tags_to_delete = []
 
     if args.seasons:
@@ -40,7 +54,7 @@ def delete_tags():
     if not tags_to_delete:
         return
 
-    response = requests.post(
+    delete_response = requests.post(
         f"{QB_URL}/api/v2/torrents/deleteTags",
         data={"tags": ",".join(tags_to_delete)},
         auth=(QB_USERNAME, QB_PASSWORD),
@@ -48,7 +62,7 @@ def delete_tags():
         timeout=10.0,
     )
 
-    if response.status_code != 200:
+    if delete_response.status_code != 200:
         print(f"Failed to delete tags: {tags_to_delete}.")
 
 
@@ -56,7 +70,7 @@ CATEGORIES_LIST = [category.strip() for category in CATEGORIES.split(",")]
 
 # Parse command line arguments
 parser = argparse.ArgumentParser(
-    description='This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes. It then tags them with "noHL seasons" or "noHL episodes" or "noHL unmatched" respectively.'
+    description="Script to manage noHL-tagged torrents in qBittorent, classifying them accordingly."
 )
 parser.add_argument(
     "--seasons",
@@ -97,10 +111,11 @@ auth_response = session.post(
 print(f"Auth status code: {auth_response.status_code}")
 print(f"Auth response text: {auth_response.text}")
 
+print("Please wait...")
+
 # Delete tags
 delete_tags()
 time.sleep(5)  # wait for tags to be deleted
-print("Please wait...")
 
 # Get the list of torrents
 response = session.get(f"{QB_URL}/api/v2/torrents/info", verify=False)
