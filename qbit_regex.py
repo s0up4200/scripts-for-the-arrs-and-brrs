@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
-"""
-Author: soup
-Description: This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes. It then tags them with "noHL seasons" or "noHL episodes" or "noHL unmatched" respectively.
-"""
-
-import requests
 import argparse
 import re
 import os
+import time
+import requests
+
+# Author: soup
+# Description: This script looks for torrents with the noHL tag in qBittorent and checks if they match a regex pattern for either season packs or episodes.
+# It then tags them with "noHL seasons" or "noHL episodes" or "noHL unmatched" respectively.
+
 
 # Add your qBittorrent Web UI credentials here or call them from the command line
 # Environment variables are used by default if not specified here or on the command line
@@ -94,11 +95,11 @@ print(f"Auth response text: {auth_response.text}")
 
 # Delete tags
 delete_tags()
+time.sleep(5)  # wait for tags to be deleted
+print("Please wait...")
 
 # Get the list of torrents
 response = session.get(f"{QB_URL}/api/v2/torrents/info", verify=False)
-
-print("Please wait...")
 
 try:
     torrents = response.json()
