@@ -123,7 +123,7 @@ for index, torrent in enumerate(torrents):
     if NOHL_TAG not in tags_list:
         continue
 
-    if not any(category in torrent["category"] for category in CATEGORIES_LIST):
+    if torrent["category"] not in CATEGORIES_LIST:
         continue
 
     updated_tags_list = tags_list.copy()
