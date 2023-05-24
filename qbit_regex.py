@@ -25,7 +25,28 @@ NOHL_EPISODES_TAG = "noHL episodes"
 NOHL_SEASONS_TAG = "noHL seasons"
 NOHL_UNMATCHED_TAG = "noHL unmatched"
 
-# Convert the categories string into a list
+
+def delete_tags():
+    if args.seasons:
+        tag_to_delete = NOHL_SEASONS_TAG
+    elif args.episodes:
+        tag_to_delete = NOHL_EPISODES_TAG
+    elif args.unmatched:
+        tag_to_delete = NOHL_UNMATCHED_TAG
+    else:
+        return
+
+    response = requests.post(
+        f"{QB_URL}/api/v2/torrents/deleteTags",
+        data={"tags": tag_to_delete},
+        auth=(QB_USERNAME, QB_PASSWORD),
+        verify=True,
+        timeout=10.0,
+    )
+    if response.status_code != 200:
+        print(f"Failed to delete tag: {tag_to_delete}.")
+
+
 CATEGORIES_LIST = [category.strip() for category in CATEGORIES.split(",")]
 
 
@@ -91,6 +112,8 @@ response = session.get(f"{QB_URL}/api/v2/torrents/info", verify=False)
 
 print("Please wait...")
 
+delete_tags()
+
 try:
     torrents = response.json()
 except requests.exceptions.JSONDecodeError:
@@ -106,53 +129,57 @@ nohl_unmatched_count = 0
 total_torrents = len(torrents)
 for index, torrent in enumerate(torrents):
     torrent_name = torrent["name"]
+    tags = torrent["tags"]
+    tags_list = tags.split(",")
 
-    # Check if the torrent has the "noHL" tag and belongs to one of the specified categories
-    if NOHL_TAG in torrent["tags"] and any(
-        category in torrent["category"] for category in CATEGORIES_LIST
+    # Check if the torrent has the "noHL" tag
+    if NOHL_TAG not in tags_list:
+        continue
+
+    # Check if the torrent belongs to one of the specified categories
+    if not any(category in torrent["category"] for category in CATEGORIES_LIST):
+        continue
+
+    updated_tags_list = tags_list.copy()
+
+    # Check for seasons and update tags if not present
+    if (
+        args.seasons
+        and re.match(r"(?i).*\bS\d+\b(?!E\d+\b).*", torrent_name)
+        and NOHL_SEASONS_TAG not in tags_list
     ):
-        tags = torrent["tags"]
-        tags_list = tags.split(",")
+        updated_tags_list.append(NOHL_SEASONS_TAG)
+        nohl_seasons_count += 1
 
-        updated_tags_list = tags_list.copy()
+    # Check for episodes and update tags if not present
+    if (
+        args.episodes
+        and re.match(r"(?i).*\bS\d+(?=E\d+\b).*", torrent_name)
+        and NOHL_EPISODES_TAG not in tags_list
+    ):
+        updated_tags_list.append(NOHL_EPISODES_TAG)
+        nohl_episodes_count += 1
 
-        # Check for seasons and update tags if not present
-        if (
-            args.seasons
-            and re.match(r"(?i).*\bS\d+\b(?!E\d+\b).*", torrent_name)
-            and NOHL_SEASONS_TAG not in tags_list
-        ):
-            updated_tags_list.append(NOHL_SEASONS_TAG)
-            nohl_seasons_count += 1
+    # Check for unmatched and update tags if not present
+    if (
+        args.unmatched
+        and not re.match(
+            r"(?i)(?=.*\bS\d+\b(?!E\d+\b)|.*\bS\d+(?=E\d+\b)).*", torrent_name
+        )
+        and NOHL_UNMATCHED_TAG not in tags_list
+    ):
+        updated_tags_list.append(NOHL_UNMATCHED_TAG)
+        nohl_unmatched_count += 1
 
-        # Check for episodes and update tags if not present
-        if (
-            args.episodes
-            and re.match(r"(?i).*\bS\d+(?=E\d+\b).*", torrent_name)
-            and NOHL_EPISODES_TAG not in tags_list
-        ):
-            updated_tags_list.append(NOHL_EPISODES_TAG)
-            nohl_episodes_count += 1
+    # Update tags if there are any changes
+    if updated_tags_list != tags_list:
+        # print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
+        # print(f"Current tags: {tags}")
+        session.post(
+            f"{QB_URL}/api/v2/torrents/addTags",
+            data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
+        )
 
-        # Check for unmatched and update tags if not present
-        if (
-            args.unmatched
-            and not re.match(
-                r"(?i)(?=.*\bS\d+\b(?!E\d+\b)|.*\bS\d+(?=E\d+\b)).*", torrent_name
-            )
-            and NOHL_UNMATCHED_TAG not in tags_list
-        ):
-            updated_tags_list.append(NOHL_UNMATCHED_TAG)
-            nohl_unmatched_count += 1
-
-        # Update tags if there are any changes
-        if updated_tags_list != tags_list:
-            # print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
-            # print(f"Current tags: {tags}")
-            session.post(
-                f"{QB_URL}/api/v2/torrents/addTags",
-                data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
-            )
 
 # Print the summary at the end
 total_processed = nohl_seasons_count + nohl_episodes_count + nohl_unmatched_count
