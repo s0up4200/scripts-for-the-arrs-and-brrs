@@ -22,8 +22,8 @@ QB_URL = os.environ.get("QB_URL", "http://localhost:8080")
 QB_USERNAME = os.environ.get("QB_USERNAME", "my_username")
 QB_PASSWORD = os.environ.get("QB_PASSWORD", "my_password")
 
-NOHL_TAG = "noHL"  # set this to the tag that identifies your non-hardlinked torrents
-CATEGORIES = "tv,4ktv,tv.cross-seed"  # the categories that you want to search in
+NOHL_TAG = "noHL"  # set to the tag that identifies your non-hardlinked torrents
+CATEGORIES = "tv,4ktv,tv.cross-seed"  # the categories you want to search in
 
 # Set the tags that you want to add to the matching torrents
 NOHL_EPISODES_TAG = "noHL episodes"
@@ -214,11 +214,16 @@ for index, torrent in enumerate(
         if updated_tags_list != tags_list:
             session.post(
                 f"{QB_URL}/api/v2/torrents/addTags",
-                data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
+                data={
+                    "hashes": torrent["hash"],
+                    "tags": ",".join(updated_tags_list),
+                },
             )
 
 # Print the summary at the end
-total_processed = nohl_seasons_count + nohl_episodes_count + nohl_unmatched_count
+total_processed = (
+    nohl_seasons_count + nohl_episodes_count + nohl_unmatched_count
+)
 print(f"Total torrents processed: {total_processed} out of {total_torrents}")
 
 if args.seasons:

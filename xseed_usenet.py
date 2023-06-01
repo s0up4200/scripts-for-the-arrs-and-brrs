@@ -27,9 +27,7 @@ import requests
 
 # settings
 base_path = "/home/user/Downloads/complete/"  # replace with the path where your completed Usenet downloads are stored
-cross_base_url = (
-    "http://127.0.0.1:2468"  # replace with the base URL of your cross-seed instance
-)
+cross_base_url = "http://127.0.0.1:2468"  # replace with the base URL of your cross-seed instance
 dest_path = "/home/user/torrents/qbittorrent/usenet/"  # replace with the path where you want to create hardlinks
 unattended = False  # set to True to run without user interaction
 
@@ -99,7 +97,9 @@ def user_prompt(question, default="no"):
 if __name__ == "__main__":
     parser = argparse.ArgumentParser(description="Process some files.")
     parser.add_argument(
-        "--unattended", action="store_true", help="run script without user interaction"
+        "--unattended",
+        action="store_true",
+        help="run script without user interaction",
     )
     args, unknown = parser.parse_known_args()
 
@@ -119,7 +119,8 @@ if __name__ == "__main__":
         hardlinked_files = list(hardlink_files(files, Path(dest_path)))
 
     if unattended or user_prompt(
-        f"Do you want to trigger a cross-seed search in {dest_path}?", default="yes"
+        f"Do you want to trigger a cross-seed search in {dest_path}?",
+        default="yes",
     ):
         print(f"Triggering cross-seed search in {dest_path}")
         send_webhook(cross_base_url, dest_path)

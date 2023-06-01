@@ -43,7 +43,9 @@ def is_movie_available(movie):
 
 
 def monitor_movie(movie):
-    update_url = f'{RADARR_URL}/api/v3/movie/{movie["id"]}?apiKey={RADARR_API_KEY}'
+    update_url = (
+        f'{RADARR_URL}/api/v3/movie/{movie["id"]}?apiKey={RADARR_API_KEY}'
+    )
     headers = {"Content-Type": "application/json"}
     payload = movie
     payload["monitored"] = True
@@ -105,7 +107,8 @@ def filter_movies(movies, custom_format_ids, match):
             if movie_file_response.status_code == 200:
                 movie_file = movie_file_response.json()
                 movie_custom_format_ids = [
-                    format["id"] for format in movie_file.get("customFormats", [])
+                    format["id"]
+                    for format in movie_file.get("customFormats", [])
                 ]
             else:
                 print(
@@ -170,10 +173,14 @@ def main():
     args = parse_args()
 
     custom_formats = fetch_custom_formats()
-    custom_format_ids = find_custom_format_ids(custom_formats, CUSTOM_FORMAT_NAMES)
+    custom_format_ids = find_custom_format_ids(
+        custom_formats, CUSTOM_FORMAT_NAMES
+    )
 
     if not custom_format_ids:
-        print(f"Error: None of the custom formats {CUSTOM_FORMAT_NAMES} were found")
+        print(
+            f"Error: None of the custom formats {CUSTOM_FORMAT_NAMES} were found"
+        )
     else:
         movies = fetch_movies()
         filtered_movies = filter_movies(movies, custom_format_ids, args.match)

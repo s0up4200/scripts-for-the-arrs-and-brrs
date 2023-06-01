@@ -15,7 +15,9 @@ import requests
 
 RADARR_URL = "http://localhost:7878/radarr"  # Replace with your Radarr URL
 RADARR_API_KEY = "api_key"  # Replace with your Radarr API key
-DIR_PATH = "/path/to/your/movie/directory"  # Replace with your movie directory path
+DIR_PATH = (
+    "/path/to/your/movie/directory"  # Replace with your movie directory path
+)
 
 
 def get_non_hardlinked_files(dir_path):
@@ -25,14 +27,19 @@ def get_non_hardlinked_files(dir_path):
         for file in files:
             if file.endswith(".mkv" or ".mp4"):
                 file_path = os.path.join(root, file)
-                if os.path.isfile(file_path) and os.stat(file_path).st_nlink == 1:
+                if (
+                    os.path.isfile(file_path)
+                    and os.stat(file_path).st_nlink == 1
+                ):
                     non_hardlinked_files.append(file_path)
 
     return non_hardlinked_files
 
 
 def save_to_csv(non_hardlinked_files, csv_file_path):
-    with open(csv_file_path, mode="w", newline="", encoding="utf-8") as csv_file:
+    with open(
+        csv_file_path, mode="w", newline="", encoding="utf-8"
+    ) as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_writer.writerow(["File Path"])
 
@@ -43,7 +50,9 @@ def save_to_csv(non_hardlinked_files, csv_file_path):
 def read_from_csv(csv_file_path):
     non_hardlinked_files = []
 
-    with open(csv_file_path, mode="r", newline="", encoding="utf-8") as csv_file:
+    with open(
+        csv_file_path, mode="r", newline="", encoding="utf-8"
+    ) as csv_file:
         csv_reader = csv.reader(csv_file)
         next(csv_reader)  # Skip header
 
@@ -85,7 +94,9 @@ def refresh_movie(movie_id):
 
 def monitor_and_search_movie(movie_id, movie_file_path):
     if not force:
-        user_input = input(f"Delete non-hardlinked movie: {movie_file_path}? (y/N): ")
+        user_input = input(
+            f"Delete non-hardlinked movie: {movie_file_path}? (y/N): "
+        )
         if user_input.lower() != "y":
             print("Skipping deletion.")
             sys.exit(0)
@@ -106,7 +117,9 @@ def monitor_and_search_movie(movie_id, movie_file_path):
     movie = response.json()
     movie["monitored"] = True
 
-    response = requests.put(movie_url, json=movie, params={"apikey": RADARR_API_KEY})
+    response = requests.put(
+        movie_url, json=movie, params={"apikey": RADARR_API_KEY}
+    )
     response.raise_for_status()
 
     search_url = f"{RADARR_URL}/api/v3/command"
@@ -117,7 +130,9 @@ def monitor_and_search_movie(movie_id, movie_file_path):
     )
     response.raise_for_status()
 
-    print(f"\nMonitoring and searching for movie: {movie['title']} (ID: {movie['id']})")
+    print(
+        f"\nMonitoring and searching for movie: {movie['title']} (ID: {movie['id']})"
+    )
 
 
 def process_movies(non_hardlinked_files, amount, force=False):

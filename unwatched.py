@@ -127,7 +127,9 @@ def get_library_media_info(section_id):
 
     except Exception as e:
         sys.stderr.write(
-            "Tautulli API 'get_library_media_info' request failed: {0}.".format(e)
+            "Tautulli API 'get_library_media_info' request failed: {0}.".format(
+                e
+            )
         )
 
 
@@ -140,7 +142,11 @@ def get_libraries_table():
         response = r.json()
 
         res_data = response["response"]["data"]["data"]
-        return [d["section_id"] for d in res_data if d["section_name"] in LIBRARY_NAMES]
+        return [
+            d["section_id"]
+            for d in res_data
+            if d["section_name"] in LIBRARY_NAMES
+        ]
 
     except Exception as e:
         sys.stderr.write(
@@ -195,10 +201,17 @@ for i in sorted(show_lst, reverse=True):
             # Shows
             print(
                 "{x.grandparent_title}: {x.title} ({x.rating_key}) was added {when} and has "
-                "not been watched. \n File location: {x.file}".format(x=x, when=added)
+                "not been watched. \n File location: {x.file}".format(
+                    x=x, when=added
+                )
             )
             shows_data.append(
-                [x.grandparent_title + ": " + x.title, x.rating_key, added, x.file]
+                [
+                    x.grandparent_title + ": " + x.title,
+                    x.rating_key,
+                    added,
+                    x.file,
+                ]
             )
         path_lst += [x.file]
 
