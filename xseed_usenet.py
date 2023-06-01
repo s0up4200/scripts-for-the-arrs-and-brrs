@@ -18,11 +18,12 @@
 ### SABNZBD/NZBGET POST-PROCESSING SCRIPT                                  ###
 ##############################################################################
 
+import argparse
 import os
-import requests
 import sys
 from pathlib import Path
-import argparse
+
+import requests
 
 # settings
 base_path = "/home/user/Downloads/complete/"  # replace with the path where your completed Usenet downloads are stored

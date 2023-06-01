@@ -1,9 +1,10 @@
-import requests
-from datetime import datetime
-import random
-import sys
 import argparse
 import os
+import random
+import sys
+from datetime import datetime
+
+import requests
 
 """
 Author: soup

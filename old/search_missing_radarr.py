@@ -1,6 +1,7 @@
 import sys
-import requests
 from datetime import datetime, timedelta
+
+import requests
 
 # This script searches for missing movies in Radarr that are considered available
 # with a physical or digital release date.

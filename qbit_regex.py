@@ -10,9 +10,10 @@ or "noHL unmatched", respectively.
 """
 
 import argparse
-import re
 import os
+import re
 import time
+
 import requests
 
 # Add your qBittorrent Web UI credentials here or call them from the command line

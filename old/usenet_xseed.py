@@ -17,8 +17,8 @@
 ##############################################################################
 
 import os
-import sys
 import subprocess
+import sys
 
 # Set the data directory constant
 DATA_DIR = "/path/to/your/data/dir"

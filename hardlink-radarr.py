@@ -6,11 +6,12 @@ This naturally breaks the hardlink and leaves you with a movie that is not seede
 This script checks for non-hardlinked movies in your Radarr library. When it finds a non-hardlinked movie, it deletes the file and instructs Radarr to trigger a search for the movie again.
 """
 
-import os
 import csv
+import os
 import sys
-import requests
 import time
+
+import requests
 
 RADARR_URL = "http://localhost:7878/radarr"  # Replace with your Radarr URL
 RADARR_API_KEY = "api_key"  # Replace with your Radarr API key

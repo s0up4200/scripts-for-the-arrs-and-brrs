@@ -6,16 +6,15 @@
 """
 Find what was added TFRAME ago and not watched using Tautulli.
 """
-from __future__ import print_function
-from __future__ import unicode_literals
+from __future__ import print_function, unicode_literals
 
-from builtins import str
-from builtins import object
-import requests
+import csv
+import os
 import sys
 import time
-import os
-import csv
+from builtins import object, str
+
+import requests
 
 TFRAME = 1.577e7  # ~ 6 months in seconds
 TODAY = time.time()

@@ -1,8 +1,9 @@
-import qbittorrentapi
-import sys
-import csv
 import argparse
+import csv
 import os
+import sys
+
+import qbittorrentapi
 
 """
 Author: soup
