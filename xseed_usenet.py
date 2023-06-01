@@ -105,7 +105,7 @@ if __name__ == "__main__":
     unattended = unattended or args.unattended
 
     files = list(find_files(Path(base_path), (".mkv", ".mp4")))
-    
+
     print(f"{len(files)} non-hardlinked movies found.")
 
     if len(files) > 0:

@@ -19,8 +19,7 @@ QB_PASSWORD = os.environ.get("QB_PASSWORD", "my_password")
 
 
 def login_qbittorrent_client(host, username, password):
-    client = qbittorrentapi.Client(
-        host=host, username=username, password=password)
+    client = qbittorrentapi.Client(host=host, username=username, password=password)
 
     try:
         client.auth_log_in()
@@ -38,19 +37,16 @@ def calculate_average_ratios(torrents):
     for torrent in torrents:
         category = torrent.category
         if category not in category_ratios:
-            category_ratios[category] = {
-                "total_ratio": 0, "count": 0, "total_size": 0}
+            category_ratios[category] = {"total_ratio": 0, "count": 0, "total_size": 0}
 
         category_ratios[category]["total_ratio"] += torrent.ratio
         category_ratios[category]["count"] += 1
         category_ratios[category]["total_size"] += torrent.size
 
-        tags = [tag.strip()
-                for tag in torrent.tags.split(",")] if torrent.tags else []
+        tags = [tag.strip() for tag in torrent.tags.split(",")] if torrent.tags else []
         for tag in tags:
             if tag not in tag_ratios:
-                tag_ratios[tag] = {"total_ratio": 0,
-                                   "count": 0, "total_size": 0}
+                tag_ratios[tag] = {"total_ratio": 0, "count": 0, "total_size": 0}
 
             tag_ratios[tag]["total_ratio"] += torrent.ratio
             tag_ratios[tag]["count"] += 1
@@ -137,13 +133,11 @@ def save_results_to_csv(sorted_categories, sorted_tags):
             if total_size_gb > 1000:
                 total_size_tb = total_size_gb / 1024  # convert to TB
                 csv_writer.writerow(
-                    ["Tag", tag, f"{average_ratio:.2f}",
-                        f"{total_size_tb:.2f} TB"]
+                    ["Tag", tag, f"{average_ratio:.2f}", f"{total_size_tb:.2f} TB"]
                 )
             else:
                 csv_writer.writerow(
-                    ["Tag", tag, f"{average_ratio:.2f}",
-                        f"{total_size_gb:.2f} GB"]
+                    ["Tag", tag, f"{average_ratio:.2f}", f"{total_size_gb:.2f} GB"]
                 )
 
     print(f"Results saved to {filename}")
@@ -171,8 +165,7 @@ def parse_arguments():
         default=QB_PASSWORD,
         help=f"qBittorrent Web UI password (default: {QB_PASSWORD})",
     )
-    parser.add_argument("--tags-only", action="store_true",
-                        help="Only export tags")
+    parser.add_argument("--tags-only", action="store_true", help="Only export tags")
     parser.add_argument(
         "--categories-only", action="store_true", help="Only export categories"
     )
@@ -197,8 +190,7 @@ def filter_excluded_items(sorted_items, excluded_items):
 def main():
     args = parse_arguments()
 
-    qbt_client = login_qbittorrent_client(
-        args.host, args.username, args.password)
+    qbt_client = login_qbittorrent_client(args.host, args.username, args.password)
     torrents = qbt_client.torrents_info()
     sorted_categories, sorted_tags = calculate_average_ratios(torrents)
 
