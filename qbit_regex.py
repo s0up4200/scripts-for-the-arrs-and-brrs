@@ -131,21 +131,17 @@ else:
     parser.print_help()
     exit()
 
-# Authenticate with qBittorrent Web UI
-session = requests.Session()
+session = requests.Session()  # Authenticate with qBittorrent Web UI
 auth_response = session.post(
     f"{QB_URL}/api/v2/auth/login",
     data={"username": QB_USERNAME, "password": QB_PASSWORD},
 )
 
 print("Script version 1.1")
-
 print(f"Auth status code: {auth_response.status_code}")
 print(f"Auth response text: {auth_response.text}")
-
 print("Please wait...")
 
-# Delete tags
 delete_tags()
 time.sleep(2)  # wait for tags to be deleted
 
@@ -158,7 +154,6 @@ except requests.exceptions.JSONDecodeError:
     print("Failed to decode JSON.")
     torrents = []
 
-# Add counters for each tag
 nohl_seasons_count = 0
 nohl_episodes_count = 0
 nohl_unmatched_count = 0
@@ -216,8 +211,6 @@ for index, torrent in enumerate(
 
         # Update tags if there are any changes
         if updated_tags_list != tags_list:
-            # print(f"Processing torrent {index + 1}/{total_torrents}: {torrent['name']}")
-            # print(f"Current tags: {tags}")
             session.post(
                 f"{QB_URL}/api/v2/torrents/addTags",
                 data={"hashes": torrent["hash"], "tags": ",".join(updated_tags_list)},
