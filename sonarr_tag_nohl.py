@@ -12,7 +12,7 @@ import requests
 api_key = 'YOUR_API_KEY'
 base_url = 'http://localhost:8989/api/v3'
 
-# Set the number of requests per second to limit the script to
+# Set the number of requests per second to limit the script to (set to 0 to disable the rate limit **No warranty is provided for this)
 requests_per_second = 1
 
 # Set the maximum number of retries and the timeout for each request
@@ -198,7 +198,8 @@ if __name__ == "__main__":
                 break
     
             # Wait for the specified number of seconds before making the next request
-            time.sleep(1 / requests_per_second)
+            if requests_per_second >= 1:
+                time.sleep(1 / requests_per_second)
             
         # If all files are hardlinked, tag the series as "hardlinked"
         # Apply the "hardlinked" or "nohl" tag to the series
