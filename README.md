@@ -55,6 +55,41 @@ Options:
   If no flags are specified, the script will only save non-hardlinked movies to non_hardlinked_files.csv
 ```
 
+## sonarr_tag_nohl.py
+The point of this script is to make sure everything in Sonarr is seeded in your torrent client. Whenever a torrent is deleted from the tracker, programs like [qbit_manage](https://github.com/StuffAnThings/qbit_manage) can automatically delete it from your qBittorrent instance for you.
+This naturally breaks the hardlink and leaves you with episodes that are not seeded anymore.
+
+This script is to identify shows that have non-hardlinked episodes in your Sonarr library. When it finds a non-hardlinked episode, it will tag the entire show in Sonarr with `nohl` so you can use something like [Upgradinatorr](https://github.com/angrycuban13/Just-A-Bunch-Of-Starr-Scripts/tree/main/Upgradinatorr) to go through and trigger Sonarr to search for that show. Shows that are fully hardlinked will be tagged with `hardlinked` just to prevend the script from re-checking these shows.
+
+You can use the `--recheck` flag to tell the script to recheck all shows.
+
+Add your Sonarr `api_key` and `base_url` to the script on lines 8 and 9 and then run the script.
+
+> **Warning**
+> This script needs to have the same path structure as Sonarr
+
+It is recommended to run the script using screen
+
+```bash
+screen -S tag_nohl python3 sonarr_tag_nohl.py
+```
+
+
+```bash
+python3 sonarr_tag_nohl.py --help
+```
+    
+```text
+Usage: python3 hardlink-radarr.py [options]
+
+Options:
+
+  --recheck            Recheck all series, even those already tagged as "hardlinked" or "nohl"
+  --help               Display this help text
+  
+  If no flags are specified, the script will only check shows that do not have the "hardlinked" or "nohl" tags
+```
+
 ## not-cutoff-radarr.py
 
 Add your `RADARR_URL`, `RADARR_API_KEY` and `CUSTOM_FORMAT_NAME` to the script on line 13, 14 and 15.
