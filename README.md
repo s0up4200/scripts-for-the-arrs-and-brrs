@@ -61,9 +61,9 @@ This naturally breaks the hardlink and leaves you with episodes that are not see
 
 This script is to identify shows that have non-hardlinked episodes in your Sonarr library. When it finds a non-hardlinked episode, it will tag the entire show in Sonarr with `nohl` so you can use something like [Upgradinatorr](https://github.com/angrycuban13/Just-A-Bunch-Of-Starr-Scripts/tree/main/Upgradinatorr) to go through and trigger Sonarr to search for that show. Shows that are fully hardlinked will be tagged with `hardlinked` just to prevend the script from re-checking these shows.
 
-You can use the `--recheck` flag to tell the script to recheck all shows.
+You can use the `-r` or `--recheck` flag to tell the script to recheck all shows. `-e` or `--export` will export every non-hardlinked episode into a csv (this will take some time) if you add `-s` or `--season` as well, the csv will contain only the "Series" and "Seasons" that contain non-hardlinked episodes (script must complete for this).
 
-Add your Sonarr `api_key` and `base_url` to the script on lines 8 and 9 and then run the script.
+Add your Sonarr `api_key` and `base_url` to the script on lines 13 and 14 and then run the script.
 
 > **Warning**
 > This script needs to have the same path structure as Sonarr
@@ -84,8 +84,10 @@ Usage: python3 hardlink-radarr.py [options]
 
 Options:
 
-  --recheck            Recheck all series, even those already tagged as "hardlinked" or "nohl"
-  --help               Display this help text
+  -r --recheck         Recheck all series, even those already tagged as "hardlinked" or "nohl"
+  -e --export          Export a list of all non hardlinked episodes, this will also force a recheck
+  -s --season          Requires "--export", this will export only the Series and Seasons once script is complete
+  -h --help            Display this help text
   
   If no flags are specified, the script will only check shows that do not have the "hardlinked" or "nohl" tags
 ```

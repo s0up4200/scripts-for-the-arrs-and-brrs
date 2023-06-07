@@ -1,5 +1,6 @@
 #!/usr/bin/env python3
 
+import csv
 import logging
 import logging.handlers
 import os
@@ -20,7 +21,7 @@ max_retries = 3
 timeout = 30
 
 # Set up logging with file rotation
-log_file = 'sonarr_tag_nohl.log'
+log_file = 'logs/sonarr_export_nohl.log'
 max_bytes = 1048576
 backup_count = 50
 handler = logging.handlers.RotatingFileHandler(log_file, maxBytes=max_bytes, backupCount=backup_count)
@@ -105,34 +106,76 @@ def is_hardlinked(file_path):
         logging.error(f'Error checking file {file_path}: could not determine if file is hardlinked')
         exit(1)
 
+# Define a function to tag a series as "hardlinked" or "nohl"
+def tag_series(series_id, tag_id):
+    make_put_request(f'{base_url}/series/editor', headers={'X-Api-Key': api_key}, json={'seriesIds': [series_id], 'tags': [tag_id], 'applyTags': 'add'})
+
+# Define a function to untag a series as "hardlinked" or "nohl"    
+def untag_series(series_id, tag_id):
+    make_put_request(f'{base_url}/series/editor', headers={'X-Api-Key': api_key}, json={'seriesIds': [series_id], 'tags': [tag_id], 'applyTags': 'remove'})
+
+# Define a function to create the innitial CSV or wipe the previous runs data
+def make_csv(export_path):
+    with open(export_path, mode="w", newline="", encoding="utf-8") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_file.truncate()
+        csv_writer.writerow(["Show,Season/Episode"])
+
+# Define a function to tag ammend the CSV with Series and Season/Episode data
+def save_to_csv(show, nohl, export_path):
+    with open(export_path, mode="a", newline="", encoding="utf-8") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerow([show, nohl])
+
+# Define a function create to the Show and Season data in the CSV
+def remove_duplicates_from_csv(export_path):
+    with open(export_path, mode="r", newline="", encoding="utf-8") as csv_file:
+        csv_reader = csv.reader(csv_file)
+        rows = list(csv_reader)
+    
+    # Remove duplicates from the list of rows
+    unique_rows = []
+    for row in rows:
+        if row not in unique_rows:
+            unique_rows.append(row)
+    
+    with open(export_path, mode="w", newline="", encoding="utf-8") as csv_file:
+        csv_writer = csv.writer(csv_file)
+        csv_writer.writerows(unique_rows)
+
 def show_help():
     help_text = """Usage: python3 hardlink-radarr.py [options]
 
 Options:
 
-  --recheck            Recheck all series, even those already tagged as "hardlinked" or "nohl"
-  --help               Display this help text
+  -r --recheck         Recheck all series, even those already tagged as "hardlinked" or "nohl"
+  -e --export          Export a list of all non hardlinked episodes, this will also force a recheck
+  -s --season          Requires "--export", this will export only the Series and Seasons once script is complete
+  -h --help            Display this help text
   
   If no flags are specified, the script will only check shows that do not have the "hardlinked" or "nohl" tags
 """
     print(help_text)
 
-# Define a function to tag a series as "hardlinked" or "nohl"
-def tag_series(series_id, tag_id):
-    make_put_request(f'{base_url}/series/editor', headers={'X-Api-Key': api_key}, json={'seriesIds': [series_id], 'tags': [tag_id], 'applyTags': 'add'})
-    
-def untag_series(series_id, tag_id):
-    make_put_request(f'{base_url}/series/editor', headers={'X-Api-Key': api_key}, json={'seriesIds': [series_id], 'tags': [tag_id], 'applyTags': 'remove'})
-
 if __name__ == "__main__":
 
-    if "--help" in sys.argv:
+    if "-h" in sys.argv or"--help" in sys.argv:
         show_help()
         sys.exit(0)
 
     recheck = False
-    if "--recheck" in sys.argv:
+    if "-r" in sys.argv or "--recheck" in sys.argv:
         recheck = True
+
+    export = False
+    if "-e" in sys.argv or "--export" in sys.argv:
+        export_path = "sonarr_export_nohl.csv"
+        export = True
+        make_csv(export_path)
+
+    season = False
+    if "-s" in sys.argv or"--season" in sys.argv:
+        season = True
 
     # Get a list of all tags from Sonarr
     logging.info('-------- Starting --------')
@@ -154,12 +197,15 @@ if __name__ == "__main__":
                 tag_label = next((tag['label'] for tag in tags if tag['id'] == tag_id), None)
                 if tag_label:
                     tags.append(tag_label.lower())
-        if recheck == True:
+        if recheck == True or export == True:
                 logging.info(f'Series {s["title"]} already has "hardlinked" or "nohl" tag, rechecking')
         else:    
             if tag_map['hardlinked'] in s['tags'] or tag_map['nohl'] in s['tags']:
                 logging.info(f'Series {s["title"]} already has "hardlinked" or "nohl" tag, skipping')
                 continue
+        
+        if export == True:
+            show = f"{s['title']} ({s['year']})"
     
         # Get the series's path
         path = s['path']
@@ -185,6 +231,12 @@ if __name__ == "__main__":
     
             # Get the episode file ID
             episode_file_id = e['episodeFileId']
+
+            if export == True and season == False:
+                nohl = f" S{e['seasonNumber']}E{e['episodeNumber']}"
+                save_to_csv(show, nohl, export_path)
+            elif export == True and season == True: 
+                nohl = f" Season {e['seasonNumber']}"
     
             # Get the file path for the episode
             episode_file = make_get_request(f'{base_url}/episodefile/{episode_file_id}', headers={'X-Api-Key': api_key}).json()
@@ -193,9 +245,14 @@ if __name__ == "__main__":
     
             # Check if the file is hardlinked
             if not is_hardlinked(file_path):
-                logging.info(f'Episode {e["title"]} is hardlinked')
-                all_hardlinked = False
-                break
+                if export == True:
+                    logging.info(f'Episode {e["title"]} not hardlinked')
+                    all_hardlinked = False
+                    save_to_csv(show, nohl, export_path)                
+                else:
+                    logging.info(f'Episode {e["title"]} not hardlinked')
+                    all_hardlinked = False
+                    break
     
             # Wait for the specified number of seconds before making the next request
             if requests_per_second >= 1:
@@ -223,6 +280,10 @@ if __name__ == "__main__":
 
         # Go to next series
         logging.info('--------Next--------')
+
+    # Dedupe CSV
+    if season == True:
+        remove_duplicates_from_csv(export_path)
 
     # We done bois
     logging.info('--------Complete--------')
