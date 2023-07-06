@@ -119,7 +119,7 @@ def make_csv(export_path):
     with open(export_path, mode="w", newline="", encoding="utf-8") as csv_file:
         csv_writer = csv.writer(csv_file)
         csv_file.truncate()
-        csv_writer.writerow(["Show,Season/Episode"])
+        csv_writer.writerow(['Show, Season/Episode'])
 
 # Define a function to tag ammend the CSV with Series and Season/Episode data
 def save_to_csv(show, nohl, export_path):
