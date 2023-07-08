@@ -169,4 +169,6 @@ You can also use the `--unattended` flag or set `unattended = True` in the scrip
 
 The script will automatically run in unattended mode if triggered by NZBGet or SABnzbd
 
+You can also use the `--cleanup` flag or set `cleanup = True` in the script to clean up the folder where cross-seed runs a data search if the files have already been added to your client as a cross-seed
+
 This will not handle season packs at this time.
