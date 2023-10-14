@@ -27,11 +27,13 @@ import requests
 
 # settings
 base_path = "/home/user/Downloads/complete/"  # replace with the path where your completed Usenet downloads are stored
-cross_base_url = "http://127.0.0.1:2468"  # replace with the base URL of your cross-seed instance
+cross_base_url = (
+    "http://127.0.0.1:2468"  # replace with the base URL of your cross-seed instance
+)
 dest_path = "/home/user/torrents/qbittorrent/usenet/"  # replace with the path where you want to create hardlinks
-cross_seed_data_path = "/home/user/torrents/qbittorrent/cross-seed-data/" # replace with the path where your cross-seed instance stores its data
+cross_seed_data_path = "/home/user/torrents/qbittorrent/cross-seed-data/"  # replace with the path where your cross-seed instance stores its data
 unattended = False  # set to True to run without user interaction
-cleanup = False # set to True to delete the files in dest_path if they are found in cross_seed_data_path
+cleanup = False  # set to True to delete the files in dest_path if they are found in cross_seed_data_path
 
 # Determine if the script is running in SABnzbd or NZBGet
 NZB_MODE = "sab" if os.environ.get("SAB_COMPLETE_DIR") else "get"
@@ -54,12 +56,33 @@ else:
     POSTPROCESS_ERROR = 1
 
 
+def is_season_pack(name: str) -> bool:
+    """
+    Check if a name (file or directory) is a season pack.
+    """
+    season_pattern = re.compile(r"s\d{2}", re.IGNORECASE)
+    episode_pattern = re.compile(r"e\d{2}", re.IGNORECASE)
+
+    if season_pattern.search(name) and not episode_pattern.search(name):
+        return True
+    return False
+
+
 def find_files(path: Path, extensions: tuple):
     for entry in path.iterdir():
-        if entry.is_file() and entry.suffix in extensions:
+        # If the entry is a directory and matches the season pack pattern, skip it
+        if entry.is_dir():
+            if is_season_pack(entry.name):
+                continue
+            else:
+                yield from find_files(entry, extensions)
+        # If the entry is a file, check its extension and ensure it's not a season pack
+        elif (
+            entry.is_file()
+            and entry.suffix in extensions
+            and not is_season_pack(entry.name)
+        ):
             yield entry
-        elif entry.is_dir():
-            yield from find_files(entry, extensions)
 
 
 def hardlink_files(file_paths: list, dest: Path):
@@ -84,6 +107,7 @@ def send_webhook(url: str, directory_path: str):
     else:
         print("Trigger failed.")
         sys.exit(POSTPROCESS_ERROR)
+
 
 def cleanup_files():
     dest_path_files = os.listdir(dest_path)
@@ -168,7 +192,9 @@ if __name__ == "__main__":
         f"Do you want to clean up the files in {dest_path} if they are in {cross_seed_data_path}?",
         default="no",
     ):
-        print(f"Cleaning up the files in {dest_path} if they are in {cross_seed_data_path}")
+        print(
+            f"Cleaning up the files in {dest_path} if they are in {cross_seed_data_path}"
+        )
         cleanup_files()
     else:
         print("Not cleaning up")
