@@ -12,9 +12,7 @@ import requests
 # Set your Sonarr API key and base URL
 api_key = 'YOUR_API_KEY'
 base_url = 'http://localhost:8989/api/v3'
-# Set your Sonarr parent directories, e.g. Sonarr container path is "/data" and host path is "/mnt/user/data", you would enter '/mnt/user'
-# Basically, add whatever before the container path.
-# Leave it empty if the script has the same path structure as Sonarr
+# Set your Sonarr parent directories
 sonarr_mapping = ''
 # Set the number of requests per second to limit the script to (set to 0 to disable the rate limit **No warranty is provided for this)
 requests_per_second = 1
