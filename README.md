@@ -68,6 +68,9 @@ Add your Sonarr `api_key` and `base_url` to the script on lines 13 and 14 and th
 > **Warning**
 > This script needs to have the same path structure as Sonarr
 
+Add Sonarr parent directories to the script on line 18 if the script does not have the same path structure as Sonarr. e.g. Sonarr container path is `/data` and host path is `/mnt/user/data`, you would enter `/mnt/user`. Basically, add whatever before the container path. Otherwise, leave empty.
+
+
 It is recommended to run the script using screen
 
 ```bash

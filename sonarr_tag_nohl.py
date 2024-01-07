@@ -12,7 +12,8 @@ import requests
 # Set your Sonarr API key and base URL
 api_key = 'YOUR_API_KEY'
 base_url = 'http://localhost:8989/api/v3'
-
+# Set your Sonarr parent directories
+sonarr_mapping = ''
 # Set the number of requests per second to limit the script to (set to 0 to disable the rate limit **No warranty is provided for this)
 requests_per_second = 1
 
@@ -208,7 +209,7 @@ if __name__ == "__main__":
             show = f"{s['title']} ({s['year']})"
     
         # Get the series's path
-        path = s['path']
+        path = sonarr_mapping + s['path']
         logging.info(f'Checking series {s["title"]} at path {path}')
     
         # Get the list of episodes for the series
@@ -240,7 +241,7 @@ if __name__ == "__main__":
     
             # Get the file path for the episode
             episode_file = make_get_request(f'{base_url}/episodefile/{episode_file_id}', headers={'X-Api-Key': api_key}).json()
-            file_path = episode_file['path']
+            file_path = sonarr_mapping + episode_file['path']
             logging.info(f'Checking file {file_path} for series {s["title"]}')
     
             # Check if the file is hardlinked
